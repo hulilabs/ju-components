@@ -108,7 +108,7 @@ define( [
             // We specify NOT recursisve because we will only setup the current component
             // to view mode. The component life cycle will be in charge of setting themselves to
             // view mode
-            if (this.opts.alwaysEditable) {
+            if (this.opts.alwaysEditable && !this.opts.readOnly) {
                 this.$view.addClass(ALWAYS_EDITABLE_CLASS);
                 this.displayEditMode();
             } else {
@@ -317,7 +317,7 @@ define( [
 
             // If this control should always be editable then we do not try to
             // switch to view mode
-            if (this.opts.alwaysEditable) {
+            if (this.opts.alwaysEditable && !this.opts.readOnly) {
                 return false;
             }
 

@@ -100,7 +100,7 @@ define([
 
             } else {
 
-                var resourceFetchStrategy = new ServerLessResourceFetcher();
+                var resourceFetchStrategy = ResourceManager.getStrategy();
                 // Creates a new instance of the strategy
                 resourcePromise = resourceFetchStrategy.fetchResources(resourceMap);
 
@@ -144,6 +144,31 @@ define([
             return ComponentUtil.isEmptyObject(resourceMap);
         }
     });
+
+    /**
+     * Class members
+     */
+    ResourceManager.classMembers({
+        /**
+         * Gets the current resource loader strategy
+         * @return {[type]} [description]
+         */
+        getStrategy : function () {
+            if (!this.strategy) {
+                // Creates a default serverless strategy
+                this.strategy = new ServerLessResourceFetcher();
+            }
+            return this.strategy;
+        },
+        /**
+         * Sets the strategy to fetch the resources
+         */
+        setStrategy : function (strategy) {
+            this.strategy = strategy;
+        }
+
+    });
+
 
     // Exports
     return ResourceManager;

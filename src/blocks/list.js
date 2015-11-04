@@ -142,117 +142,129 @@ define( [
             var self = this;
             insertionPoint = insertionPoint || this.insertionPoint;
 
-                // Generate a unique ID for this component
-                var componentId = self.getNextComponentId(),
-                    // We store this flag locally for later reference in the
-                    // promise callback, because the value in the instance
-                    // can change before the callback gets executed
-                    isSettingData = this.isSettingData;
+            // require([componentPath], function (ComponentClass) {
 
-                log('ListComponent: Assigning new ID to child ', componentId);
+            // Generate a unique ID for this component
+            var componentId = self.getNextComponentId(),
+                // We store this flag locally for later reference in the
+                // promise callback, because the value in the instance
+                // can change before the callback gets executed
+                isSettingData = this.isSettingData;
 
-                // Create new component instance with options
-                var template = self.c('template');
 
-                if (!template) {
-                    Logger.error('ListComponent: Child template definition is not valid.');
-                    return;
-                }
+            log('ListComponent: Assigning new ID to child ', componentId);
 
-                // Retrieves the class from the template instance
-                var ComponentClass = template._class,
-                    // Component instance ready
-                    compInst = new ComponentClass(template.opts);
+            var template = self.c('template');
 
-                self.hasDefaultItem = self.hasDefaultItem && self.opts.alwaysEditable;
+            if (!template) {
+                Logger.error('ListComponent: Child template definition is not valid.');
+                return;
+            }
 
-                if (!self.hasDefaultItem && self.listDict[self.defaultItemId]) {
-                	self.listDict[self.defaultItemId].setAsListDefaultItem(false);
-                	self.defaultItemId = null;
-                }
+            // Retrieves the class from the template instance
+            var ComponentClass = template._class,
+                // Component instance ready
+                compInst = new ComponentClass(template.opts);
 
-                if (self.hasDefaultItem) {
-                    this.defaultItemId = componentId;
-                }
+            self.hasDefaultItem = self.hasDefaultItem && self.opts.alwaysEditable;
 
-                // Set the parent component of the instance as the list itself
-                compInst.setParentComponent(self);
+            if (!self.hasDefaultItem && self.listDict[self.defaultItemId]) {
+                self.listDict[self.defaultItemId].setAsListDefaultItem(false);
+                self.defaultItemId = null;
+            }
 
-                // Store list id on child
-                compInst.parentListID = componentId;
+            if (self.hasDefaultItem) {
+                this.defaultItemId = componentId;
+            }
 
-                // Run the setup method of the instance
-                var fetchChildrenPromise = compInst.fetchChildrenComponents(compInst, self.loadArgs, self.childrenExtendedOpts.template);
+            // Set the parent component of the instance as the list itself
+            compInst.setParentComponent(self);
 
-                fetchChildrenPromise.then(function () {
+            // Store list id on child
+            compInst.parentListID = componentId;
 
-                        if (componentId == self.defaultItemId && self.defaultItemShouldBeDeleted) {
-                            self.hasDefaultItem = false;
-                            return;
-                        }
+            if (compInst.extractOwner) {
+                /* The item owner is required to be set before the component is setup.
+                 * It is used to handle certain permissions based on the doctor who owns the item.
+                 * For example, see the documents section, where different documents belog to different doctors
+                 * and in certain cases you will be able to download the file and in other dont.
+                 */
+                compInst.setOption('id_user_owner', compInst.extractOwner(data));
+            }
 
-                        // If there is any notification center defined then pass it to the newly created child
-                        if (self.backbone) {
-                            compInst.callRecursively('setBackbone', self.backbone);
-                        }
+            // Run the setup method of the instance
+            var fetchChildrenPromise = compInst.fetchChildrenComponents(compInst, self.loadArgs, self.childrenExtendedOpts.template);
 
-                        if (self.opts.readOnly) {
-                            // Only set read only recursevely when we want something to become
-                            // read only with all its childrens. If we run this also when self.opts.readOnly
-                            // is false we might run into the case where there is a nested child
-                            // whose default conf was to be read only and will become writable due to
-                            // the setOption.
-                            compInst.setOption('readOnly', self.opts.readOnly, true);
-                        }
-                        compInst.setup(insertionPoint);
+            fetchChildrenPromise.then(function () {
 
-                        if (self.hasDefaultItem && compInst.setAsListDefaultItem) {
-		                	compInst.setAsListDefaultItem(self.hasDefaultItem);
-		                	self.hasDefaultItem = false;
-		                	self.defaultItemId = componentId;
-		                }
+                    if (componentId == self.defaultItemId && self.defaultItemShouldBeDeleted) {
+                        self.hasDefaultItem = false;
+                        return;
+                    }
 
-                        // If there is no data and the component and the
-                        // new component is editable or we want to force enable mode,
-                        // then we should show the edit mode
-                        var shouldEnableEditMode = compInst.enableEditMode && (!data || enableChildEditMode);
+                    // If there is any notification center defined then pass it to the newly created child
+                    if (self.backbone) {
+                        compInst.callRecursively('setBackbone', self.backbone);
+                    }
 
-                        // sets data before enabling edit mode
-                        compInst.setData(data);
+                    if (self.opts.readOnly) {
+                        // Only set read only recursevely when we want something to become
+                        // read only with all its childrens. If we run this also when self.opts.readOnly
+                        // is false we might run into the case where there is a nested child
+                        // whose default conf was to be read only and will become writable due to
+                        // the setOption.
+                        compInst.setOption('readOnly', self.opts.readOnly, true);
+                    }
 
-                        // listen child events
-                        if (self.opts.childListeners.length > 0) {
-                            self.attachChildListeners.call(self, compInst);
-                        }
+                    compInst.setup(insertionPoint);
 
-                        // Trigger edit mode
-                        if (shouldEnableEditMode) {
-                            compInst.enableEditMode(true);
-                        }
+                    if (self.hasDefaultItem && compInst.setAsListDefaultItem) {
+                        compInst.setAsListDefaultItem(self.hasDefaultItem);
+                        self.hasDefaultItem = false;
+                        self.defaultItemId = componentId;
+                    }
 
-                        // add component to list
-                        self.listDict[componentId] = compInst;
-                        self.listDictCount = self.listDictCount + 1;
+                    // If there is no data and the component and the
+                    // new component is editable or we want to force enable mode,
+                    // then we should show the edit mode
+                    var shouldEnableEditMode = compInst.enableEditMode && (!data || enableChildEditMode);
 
-                        if (!self.opts.sortBy) {
-                            // unsorted, just add as the last child
-                            self.sortedChildList.push(compInst);
-                        } else {
-                            self.sortAddedChild(compInst, isSettingData, data);
-                        }
+                    // sets data before enabling edit mode
+                    compInst.setData(data);
 
-                        // We only fire the events when we are not setting data programatically to the component
-                        if (!isSettingData) {
-                            self.fireEventAndNotify(ListComponent.EV.CHILD_ADDED, compInst);
-                        }
+                    // listen child events
+                    if (self.opts.childListeners.length > 0) {
+                        self.attachChildListeners.call(self, compInst);
+                    }
 
-                        // Max children reached
-                        self.notifyMaxChildrenReached();
+                    // Trigger edit mode
+                    if (shouldEnableEditMode) {
+                        compInst.enableEditMode(true);
+                    }
 
-                        if (resolve) {
-                            resolve();
-                        }
-                    });
+                    // add component to list
+                    self.listDict[componentId] = compInst;
+                    self.listDictCount = self.listDictCount + 1;
+
+                    if (!self.opts.sortBy) {
+                        // unsorted, just add as the last child
+                        self.sortedChildList.push(compInst);
+                    } else {
+                        self.sortAddedChild(compInst, isSettingData, data);
+                    }
+
+                    // We only fire the events when we are not setting data programatically to the component
+                    if (!isSettingData) {
+                        self.fireEventAndNotify(ListComponent.EV.CHILD_ADDED, compInst);
+                    }
+
+                    // Max children reached
+                    self.notifyMaxChildrenReached();
+
+                    if (resolve) {
+                        resolve();
+                    }
+                });
 
             return componentId;
         },
@@ -365,44 +377,22 @@ define( [
         },
 
         /**
-         * For a sorted list, inserts a child in a certain index
-         * @param  {int}    index
-         * @param  {Object} childToInsert Instance of component to insert
+         * For a sorted list, inserts a child in a certain index in `sortedChildList`
+         * Note that it doesn't handle any view changes
+         * @param  {int}     index
+         * @param  {Object}  childToInsert Instance of component to insert
          */
         insertChildAtIndex : function(index, childToInsert) {
             // inserting a child as last element is a special case
             // this flag will say if we're going to do so
-            var shouldInsertAsLast = (index == this.sortedChildList.length);
-
-            // obtains a reference to the child in the destination index
-            var currentChildAtIndex = !shouldInsertAsLast ?
-                                      this.sortedChildList[index] :
-                                      // handles special case for insert as last
-                                      this.sortedChildList[this.sortedChildList.length - 1];
-
-            if (!currentChildAtIndex) {
-                Logger.error('ListComponent: attempting to insert a sorted child at bad index', index, this.sortedChildList);
-                return;
-            }
-
-            // obtains the markup for the children used for reference
-            var currentChildMarkup = this.getChildWrapperMarkup(currentChildAtIndex),
-            // removes the child from its current position and obtains a reference to its markup
-                childToInsertMarkup = this.getChildWrapperMarkup(childToInsert).detach();
+            var shouldInsertAsLast = this.shouldInsertAsLast(index);
 
             // checks if the child isn't the last using the previously set
             if (!shouldInsertAsLast) {
-                // inserts the child's markup in the proper position
-                childToInsertMarkup.insertBefore(currentChildMarkup);
-
                 // updates internal reference in sorted array
                 this.sortedChildList.splice(index, 0, childToInsert);
 
             } else {
-                // the child is the last, so we get the current tail
-                // and add the children markup after
-                childToInsertMarkup.insertAfter(currentChildMarkup);
-
                 // updates internal reference in sorted array
                 this.sortedChildList.push(childToInsert);
             }
@@ -411,12 +401,13 @@ define( [
         },
 
         /**
-         * Obtains the host markup created by the list to insert a child
-         * @param  {Object} child instance of Component and a child of this list
-         * @return {Object}       jQuery object
+         * Inserting in a sorted list as last is a special case
+         * this method returns true in that scenario
+         * @param  {index} indexToInsertInto
+         * @return {boolean}
          */
-        getChildWrapperMarkup : function(child) {
-            return child.$view.parent();
+        shouldInsertAsLast : function(indexToInsertInto) {
+            return (indexToInsertInto == this.sortedChildList.length);
         },
 
         /**
@@ -591,15 +582,15 @@ define( [
                 var compData = compInst.getData();
 
                 if (self.opts.skipFieldOnUndefined) {
-                	if (undefined !== compData) {
-                		childrenData.push(compData);
-                	}
+                    if (undefined !== compData) {
+                        childrenData.push(compData);
+                    }
                 } else if (self.defaultItemId) {
-                	if (compData) {
-                		childrenData.push(compData);
-                	}
+                    if (compData) {
+                        childrenData.push(compData);
+                    }
                 } else {
-                	childrenData.push(compData);
+                    childrenData.push(compData);
                 }
             });
 

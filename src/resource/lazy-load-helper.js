@@ -87,6 +87,10 @@ define([
             return L10n.t(l10nKey);
         },
 
+        t : function(l10nKey) {
+            return L10n.t(l10nKey);
+        },
+
         getOptionsData : function(optionsDataKey) {
             return OptionsDataStorage.getInst().get(optionsDataKey);
         },

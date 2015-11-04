@@ -6,7 +6,8 @@
         "ju-shared" : "hulilabs/ju-shared",
         "x-editable" : "1.5.1",
         "text" : "2.0.14",
-        "mustache.js" : ">=2.2.0"
+        "mustache.js" : ">=2.2.0",
+        "dropzone" : ">=4.2.0"
     },
     "moduleType": [
         "amd"

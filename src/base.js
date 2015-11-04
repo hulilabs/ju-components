@@ -417,16 +417,21 @@ define( [
          * @warn ALWAYS call setOptions BEFORE _super
          * @param {object} class level options to queue
          */
-        setOptions : function (opts) {
+        setOptions : function () {
             this.optsCollector = this.optsCollector || [];
             // Optimized array prepend
             // this.optsCollector.unshift(opts);
             // this.optsCollector = [opts].concat(this.optsCollector);
-            var i, len = this.optsCollector.length + 1,
+            var i, argLen, len = this.optsCollector.length + arguments.length,
                 optsArr = new Array(len);
-                optsArr[0] = opts;
-            for (i = 0; i < len; ++i) {
+
+            for (i = 0, argLen = arguments.length;  i < argLen; i++) {
+                optsArr[i] = arguments[i];
+            }
+
+            for (i = 0; i < len; i++) {
                 optsArr.push(this.optsCollector[i]);
+
             }
             this.optsCollector = optsArr;
         },
@@ -508,25 +513,31 @@ define( [
 
             var childrenLoadedPromise = new Promise(function (resolve, reject) {
 
-                self.initChildrenDef.apply(self, loadArgs);
+                var promise = self.initChildrenDef.apply(self, loadArgs);
 
-                if (!self.childrenDef) {
-                    log('fetchChildrenComponents: No children defined...');
-                    // Resolve inmediatelly as we dont have any children to load
-
-                    resolve();
-                } else {
-                    log('fetchChildrenComponents: Loading children def...', self.childrenDef );
-                    // Loading
-                    FactoryBase
-                        .getInst()
-                        .createInstances(self.childrenDef, parentComponent, loadArgs, childrenExtendedOpts)
-                        .then(function (components) {
-                            self.components = components;
-                            resolve();
-                        })
-                        ['catch'](reject);
+                if (!promise) {
+                    promise = Promise.resolve();
                 }
+
+                promise.then(function(){
+                    if (!self.childrenDef) {
+                        log('fetchChildrenComponents: No children defined...');
+                        // Resolve inmediatelly as we dont have any children to load
+
+                        resolve();
+                    } else {
+                        log('fetchChildrenComponents: Loading children def...', self.childrenDef );
+                        // Loading
+                        FactoryBase
+                            .getInst()
+                            .createInstances(self.childrenDef, parentComponent, loadArgs, childrenExtendedOpts)
+                            .then(function (components) {
+                                self.components = components;
+                                resolve();
+                            })
+                            ['catch'](reject);
+                    }
+                });
 
                 // Only when all the children have been fetched then we resolve the current promise
                 // log('Only when all the children have been fetched then we resolve the current promise');
