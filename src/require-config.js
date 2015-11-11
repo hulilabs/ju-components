@@ -18,6 +18,7 @@ require.config({
     paths: {
         'jquery' : 'lib/jquery-exporter',
         'ju-shared' : 'lib/vendor/shared',
-        'ju-components' : 'lib/vendor/components'
+        'ju-components' : 'lib/vendor/components',
+        'x-editable' : 'lib/vendor/x-editable/dist/jquery-editable/js/jquery-editable-poshytip',
     }
 });
