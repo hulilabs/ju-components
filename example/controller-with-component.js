@@ -26,7 +26,7 @@
  *           however, explanatory comments are reliable :p
  */
 define([
-            'lib/component/landing-module',
+            'ju-components/landing-module',
             'example/basic-component-1'
         ],
         function (

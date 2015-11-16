@@ -42,7 +42,7 @@ define( [
 
     var RESOURCE_MAP = {
         cssFile : [
-            'css/lib/component/blocks/editable'
+            'css/ju-components/blocks/editable'
         ]
     };
 

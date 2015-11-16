@@ -28,7 +28,7 @@ define( [
 
     var RESOURCE_MAP = {
         cssFile : [
-            'css/lib/component/blocks/single-template/editable'
+            'css/ju-components/blocks/single-template/editable'
         ]
     };
 

@@ -17,7 +17,7 @@
  *           however, explanatory comments are reliable :p
  */
 define( [
-            'lib/component/base'
+            'ju-components/base'
         ],
         function (
             BaseComponent

@@ -101,7 +101,7 @@ define( [
 
         	var dataPromise = new Promise(function (resolve, reject) {
                 // Children of base component proxy
-                // lib/component/base-with-proxy/proxy
+                // ju-components/base-with-proxy/proxy
                 if (self.opts.proxy != null && self.opts.proxy.getPayload) {
                 	self.opts.proxy.getPayload(data, resolve, reject);
                 } else {
