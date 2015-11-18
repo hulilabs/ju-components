@@ -30,17 +30,17 @@ define( [
 
 
     ComponentUtil.classMembers({
-    	/**
+        /**
          * Check if the string is an L10n key
          */
-    	isL10nKey : function(str, prefixKey) {
+        isL10nKey : function(str, prefixKey) {
             if ('string' === typeof str) {
-        		prefixKey = prefixKey || /^!@/;
-        		return (str.match(prefixKey) != null);
+                prefixKey = prefixKey || /^!@/;
+                return (str.match(prefixKey) != null);
             }
 
             return false;
-    	},
+        },
         /**
          * Process the L10n keys in the object
          * For example:

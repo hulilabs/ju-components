@@ -206,11 +206,11 @@ define( [
          * Only the root component should call this method
          */
         load : function () {
-        	// Checks root component
-        	if (this.isRootComponent) {
+            // Checks root component
+            if (this.isRootComponent) {
 
-	            var self = this,
-	            	args = arguments;
+                var self = this,
+                    args = arguments;
 
                 // Stores the insertion point
                 if (!self.storeInsertionPoint.apply(self, arguments)) {
@@ -220,21 +220,21 @@ define( [
                 // Activates the spinner
                 self.toggleSpinnerVisibility(true);
 
-	            // Load the children components and then trigger
-	            var componentsFetchedPromise = self.fetchChildrenComponents(self, args);
+                // Load the children components and then trigger
+                var componentsFetchedPromise = self.fetchChildrenComponents(self, args);
 
-	            self.setupCompletedPromise = componentsFetchedPromise
-	                // Wait for all the JS depedencies to load
-	                .then(function() {
+                self.setupCompletedPromise = componentsFetchedPromise
+                    // Wait for all the JS depedencies to load
+                    .then(function() {
 
-	                    // At this point, all the JS dependencies of all the children components are loaded
-	                    // We now proceed to load the resources for all the components
-	                    log('Component: Ready to fetch resources of all components');
+                        // At this point, all the JS dependencies of all the children components are loaded
+                        // We now proceed to load the resources for all the components
+                        log('Component: Ready to fetch resources of all components');
 
-	                    // Fetches the resources in a single request from the children components and itself
-	                    // At this point all the children components are ready in memory
-	                    return self.fetchResources();
-	                })
+                        // Fetches the resources in a single request from the children components and itself
+                        // At this point all the children components are ready in memory
+                        return self.fetchResources();
+                    })
                     // At this point we have all the children and their resources in memory,
                     // The root component always provides a backbone that will be a
                     // bus to communicate global events in all the components tree
@@ -243,14 +243,14 @@ define( [
                         var backbone = new Backbone();
                         self.callRecursively('setBackbone', backbone);
                     })
-	                // Wait for all the resources to load
-	                .then(function () {
+                    // Wait for all the resources to load
+                    .then(function () {
                         // Setup this component
                         // The order will be from top to bottom in the component tree
-	                    var result =  self.setup.apply(self, args);
+                        var result =  self.setup.apply(self, args);
                         // This wil return a promise that will be chained in the lifecyle
                         return result;
-	                });
+                    });
 
                 // This catch will capture any error during the loading and setup process
                 self.setupCompletedPromise
@@ -262,9 +262,9 @@ define( [
                     self.toggleSpinnerVisibility(false);
                 });
 
-            	return self.setupCompletedPromise;
+                return self.setupCompletedPromise;
             } else {
-            	Logger.error('Component: Child component is trying to fetch data in load');
+                Logger.error('Component: Child component is trying to fetch data in load');
             }
         },
         /**
@@ -348,7 +348,7 @@ define( [
          */
         childrenSetup : function () {
             var self = this,
-            	args = Array.prototype.slice.call(arguments, 1);
+                args = Array.prototype.slice.call(arguments, 1);
 
             // Register children maps
             $.each(self.components, function (key, childComp) {
