@@ -112,23 +112,30 @@ define( [
                 this.$view.addClass(ALWAYS_EDITABLE_CLASS);
                 this.displayEditMode();
             } else {
-                this.displayViewMode();
+                this.displayViewMode(true); // asume empty as default state
             }
         },
         /**
          * Process data set to editable
          */
         setData : function () {
-            var isEmpty = false;
+            var self = this,
+                result = this._super.apply(this, arguments),
+                isEmpty = result.isEmpty,
+                resultPromise = result.promise;
 
-            if (!this.opts.visibleOnEmptyData) {
-                var data = arguments[0];
-                isEmpty = this.processVisibleEmptyData(data);
+            if (resultPromise) {
+                result.promise = resultPromise.then(function(isLocalEmpty){
+                    self.displayOnEmpty(isLocalEmpty);
+                    return isLocalEmpty;
+                });
+            } else if (typeof isEmpty === 'boolean') {
+                this.displayOnEmpty(result.isEmpty);
+            } else {
+                Logger.error('editable : cant resolve visibility', result);
             }
 
-            this.displayOnEmpty(isEmpty);
-
-            return this._super.apply(this, arguments);
+            return result;
         },
         /**
          * Open edit mode
@@ -148,7 +155,6 @@ define( [
                 e.preventDefault();
                 e.stopPropagation();
                 this.enableEditMode(false);
-                // this.activateViewMode();
             }
         },
         /**
@@ -310,7 +316,6 @@ define( [
          * Deactivates the edit mode from this component and all its children
          */
         activateViewMode : function (eventInfo) {
-
             // We cannot simply render the view mode .
             // We need to validate first if the data entered is valid
             var errors = this.validate();
@@ -326,58 +331,64 @@ define( [
             if (activateSuccesful) { // @TODO : What happens when we are initializing and the is no data to commit?
                 this.$view.removeClass(EDITABLE_ROOT);
                 this.removeDescendantListeners();
-                // The commit changes method will be responsible for calling the displayViewMode method
-                this.callRecursively('commitChanges', eventInfo);
+                // Commit changes recursively bottom-top
+                // Check each children emptiness simultaneously
+                this.cascadeStateChange(eventInfo);
             }
 
             return activateSuccesful;
         },
         /**
-         * Deactivates the edit mode from this component and all its children
+         * Custom actions done on cascadeStateChange for emptiness flow
+         * - Control editable view mode based on empty state
+         * @param {boolean} isEmpty : final emptiness state
          */
-        commitChanges : function () {
-            this.displayViewMode();
+        onCascadeCheckEmptiness : function (isEmpty) {
+            var isEmpty = this._super.apply(this, arguments);
+
+            // Deactivates the edit mode
+            this.displayViewMode(isEmpty);
+
+            // Trigger commit event (notify data changes)
             this.fireEventAndNotify(EditableComponent.EV.COMMIT);
+
+            return isEmpty;
         },
         /**
          * Builds the view mode
          * This method should be overwritten in child classes.
          * The only responsability of this class is to generate and show the
          * view mode, the validation and submittion of the data is handled by other classes
-         *
-         * @todo resolve issue when a child component doesn'
-         * inherits from editable but a child of the child does
-         * @param boolean isEmpty emptyness state
+         * @param boolean isEmpty emptiness state
          */
         displayViewMode : function (isEmpty) {
+            if (typeof isEmpty !== 'boolean') {
+                Logger.error('displayViewMode : isEmpty state boolean required', isEmpty);
+            }
+
             log('EditableComponent: Switching to displayViewMode');
             this.$view.removeClass(EDITING_CLASS_PREFIX);
-            this.displayOnEmpty(isEmpty);
             this.opts.enableEditMode = false;
+            return this.displayOnEmpty(isEmpty);
         },
         /**
-         * Detect editable emptyness
+         * Detect editable emptiness
          * On true: add empty styles and trigger event
          */
         displayOnEmpty : function (isEmpty) {
             if (typeof isEmpty === 'undefined') {
-                var data = this.getData();
-
-                // Check if any data is set on the parent level too
-                if (this.getDataForParent) {
-                    var extraDataForParent = this.getDataForParent();
-                    data = $.extend(true, {}, data, extraDataForParent);
-                }
-
-                isEmpty = this.processVisibleEmptyData(data);
+                Logger.warn('displayOnEmpty : isEmpty state boolean required');
             }
 
             this.$view.toggleClass(EDITABLE_EMPTY, isEmpty);
+            this.setEmptiness(isEmpty);
 
             // Trigger empty data event
             if (isEmpty) {
                 this.fireEvent(EditableComponent.EV.DATA_EMPTY, this);
             }
+
+            return isEmpty;
         },
         /**
          * Builds the edit mode

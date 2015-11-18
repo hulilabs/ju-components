@@ -134,12 +134,16 @@ define( [
             return source;
         },
         /**
-         * Checks for any complex objects emptyness recursively
+         * Checks for any complex objects emptiness recursively
          * http://jsfiddle.net/f6bvq9np/1/
          * http://jsperf.com/isemptydata
          */
-        isEmptyObject : function(data) {
+        isEmptyObject : function(data, validValues) {
             var dataType = typeof data;
+            // Custom valid values check
+            if (validValues && $.inArray(data, validValues) > -1) {
+                return false;
+            }
             // Most common and leaf values
             if (dataType === 'undefined' || data === null || data === "" || data === '0' || data === 0) {
                 return true;

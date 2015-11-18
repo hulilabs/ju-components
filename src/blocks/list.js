@@ -118,14 +118,16 @@ define( [
             // debugger;
             if (this.canAddChild.apply(this, arguments)) {
                 if (!this.opts.triggerOnSetDataEnd) {
-                    this.addChildAsPromised.apply(this, arguments);
-                    return null;
+                    return this.addChildAsPromised.apply(this, arguments);
                 } else {
-                    // return new Promise($.proxy.apply($, [this.addChildAsPromised, this].concat(arguments)));
-                    return new Promise($.proxy(this.addChildAsPromised, this, data, enableChildEditMode));
+                    return  {
+                        componentId : null,
+                        promise : (new Promise($.proxy(this.addChildAsPromised, this, data, enableChildEditMode)))
+                    };
                 }
             } else {
                 this.notifyChildNotAdded.apply(this, arguments);
+                return false;
             }
         },
         /**
@@ -195,7 +197,7 @@ define( [
             // Run the setup method of the instance
             var fetchChildrenPromise = compInst.fetchChildrenComponents(compInst, self.loadArgs, self.childrenExtendedOpts.template);
 
-            fetchChildrenPromise.then(function () {
+            var chainfetchChildrenPromise = fetchChildrenPromise.then(function () {
 
                     if (componentId == self.defaultItemId && self.defaultItemShouldBeDeleted) {
                         self.hasDefaultItem = false;
@@ -230,7 +232,7 @@ define( [
                     var shouldEnableEditMode = compInst.enableEditMode && (!data || enableChildEditMode);
 
                     // sets data before enabling edit mode
-                    compInst.setData(data);
+                    var result = compInst.setData(data);
 
                     // listen child events
                     if (self.opts.childListeners.length > 0) {
@@ -261,12 +263,18 @@ define( [
                     // Max children reached
                     self.notifyMaxChildrenReached();
 
+                    // If resolve it pass, then conclude addChildPromise using resolve
                     if (resolve) {
-                        resolve();
+                        return resolve(result);
                     }
+
+                    return result;
                 });
 
-            return componentId;
+            return {
+                componentId : componentId,
+                promise : chainfetchChildrenPromise
+            };
         },
 
         /**
@@ -516,7 +524,7 @@ define( [
          * Process empty list
          */
         emptyList : function () {
-            var isEmptyList = (this.listDictCount === 0);
+            var isEmptyList = this.isEmptyList();
             if (isEmptyList) {
                 // We only fire the events when we are not setting data programatically to the component
                 if (!this.isSettingData) {
@@ -525,6 +533,12 @@ define( [
             }
 
             return isEmptyList;
+        },
+        /**
+         * Check if list is empty
+         */
+        isEmptyList : function () {
+            return (this.listDictCount === 0);
         },
         /**
          * Add custom child listeners
@@ -600,53 +614,65 @@ define( [
          * Sets the data of the current component plus the values of the children components
          */
         setData : function (data) {
-            if ($.isArray(data) && data.length > 0 && this.opts.alwaysEditable && this.defaultItemId) {
-                this.defaultItemShouldBeDeleted = true;
-                this.hasDefaultItem = false;
-            }
-
             this.isSettingData = true;
 
-            var setSuccessfull = false;
+            var results = BaseUIComponent.getResultDefaultObject('isEmpty','success');
 
             // clear the current components
             this.clear();
 
             if ($.isArray(data)) {
-                // tests if should trigger an event once done setting data
-                if (!this.opts.triggerOnSetDataEnd) {
-                    // adds childrens normally, for every data member
-                    this.setChildrenData(data);
-                } else {
-                    // uses promises to trigger SET_DATA_END once done
-                    this.setChildrenDataWithDoneTrigger(data);
+                results.isEmpty = (data.length === 0);
+                var canSetData = results.success = !results.isEmpty;
+                if (canSetData) {
+                    // Default item
+                    if (this.opts.alwaysEditable && this.defaultItemId) {
+                        this.defaultItemShouldBeDeleted = true;
+                        this.hasDefaultItem = false;
+                    }
+                    // tests if should trigger an event once done setting data
+                    if (!this.opts.triggerOnSetDataEnd) {
+                        // Adds childrens normally, for every data member
+                        // Return array of promises. Can be also false for not set child
+                        results.promise = Promise.all(this.setChildrenData(data));
+                    } else {
+                        // uses promises to trigger SET_DATA_END once done
+                        // Return single all-promise, resolved after all children are set
+                        results.promise = this.setChildrenDataWithDoneTrigger(data);
+                    }
                 }
-
-                setSuccessfull = data.length > 0;
             } else {
                 Logger.error("ListComponent: cannot set data that isn't an array");
             }
 
             this.isSettingData = false;
 
-            return setSuccessfull;
+            // Standard set data result object
+            // @see base-ui
+            return this.setDataResult(results);
         },
         /**
          * Adds a child for every member in data
          * @param {array} data
          */
         setChildrenData : function(data) {
-            var self = this;
+            var self = this,
+                childrenSetDataPromiseArray = [],
+                listItemSetDataResult;
 
             $.each( data, function( index, value ) {
                 if (self.canAddChild(value)) {
-                    self.addChild(value);
+                    listItemSetDataResult = self.addChild(value);
+                    childrenSetDataPromiseArray.push(listItemSetDataResult.promise);
                 } else {
                     self.notifyChildNotAdded(value);
                 }
             });
 
             self.notifyMaxChildrenReached();
+
+            // Return each promises to resolve or catch
+            return childrenSetDataPromiseArray.length > 0 ? childrenSetDataPromiseArray : false;
         },
         /**
          * Adds a child for every member in data and triggers SET_DATA_END when done
@@ -655,25 +681,29 @@ define( [
         setChildrenDataWithDoneTrigger : function(data) {
             var self = this,
                 childrenSetDataPromiseArray = [],
-                childrenSetDataPromise;
+                listItemSetDataResult;
 
             // appends every child and stores a promise for each
             // note that this happens only because `triggerOnSetDataEnd` opt is enabled
             $.each( data, function( index, value ) {
                 if (self.canAddChild(value)) {
-                    childrenSetDataPromise = self.addChild(value);
-                    childrenSetDataPromiseArray.push(childrenSetDataPromise);
+                    listItemSetDataResult = self.addChild(value);
+                    childrenSetDataPromiseArray.push(listItemSetDataResult.promise);
                 } else {
                     self.notifyChildNotAdded(value);
                 }
             });
 
             // triggers SET_DATA_END event when all the childrens are done setting data, as promised
-            var allChildrenSetData = Promise.all(childrenSetDataPromiseArray);
-            allChildrenSetData.then(function() {
-                self.notifyMaxChildrenReached();
-                self.trigger(ListComponent.EV.SET_DATA_END);
-            });
+            var allChildrenSetData = Promise.all(childrenSetDataPromiseArray),
+                chainAllChildrenSetData = allChildrenSetData.then(function(results) {
+                    self.notifyMaxChildrenReached();
+                    self.trigger(ListComponent.EV.SET_DATA_END);
+                    return results;
+                });
+
+            // Return all-promise to resolve or catch
+            return chainAllChildrenSetData;
         },
 
         /**

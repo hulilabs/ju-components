@@ -420,8 +420,6 @@ define( [
         setOptions : function () {
             this.optsCollector = this.optsCollector || [];
             // Optimized array prepend
-            // this.optsCollector.unshift(opts);
-            // this.optsCollector = [opts].concat(this.optsCollector);
             var i, argLen, len = this.optsCollector.length + arguments.length,
                 optsArr = new Array(len);
 
@@ -715,8 +713,22 @@ define( [
             return setSuccessfull;
         },
         /**
-         *
+         * Compose a standard result object
+         * @return {object} standard result object
+         *                  - inst {Object} reference to current component
          */
+        composeResultObject : function (args, defaultResultObject) {
+            return $.extend.apply($, [true, {}, defaultResultObject].concat([].slice.call(args)).concat({ inst: this }));
+        },
+        /**
+         * Standard object returned by a setData method
+         * @abstract
+         * - inst    {Object}  reference to current component
+         * - success {boolean} set data failed or succeded
+         */
+        setDataResult : function () {
+            return this.composeResultObject(arguments, { success : false });
+        },
         /**
          * Called when the setData method is called
          * Receives the parent data object and extracts
@@ -726,7 +738,6 @@ define( [
          * @return mixed
          */
         extractParentData : null,
-
         /**
          * Called when the getData method is called.
          * If this method is implemented in the children class then
@@ -799,7 +810,7 @@ define( [
 
             // We will resolve from bottom to top because the local method
             // might be dependant on that method being resolved first in the children
-            // (i.e.) commitChanges before a call to getData method locally
+            // (i.e.) cascadeStateChange before a call to getData method locally
 
             // Run this method on the children only if the option is undefined
             // or the funtion returns true
@@ -883,15 +894,17 @@ define( [
          * Check if key is defined as a child component
          * @param  {Object} childKey key for retrieval
          */
-        childExists : function (childKey) {
-            return !!this.components[childKey] && this.components.hasOwnProperty(childKey);
+        childExists : function (childKey, componentsContext) {
+            componentsContext = componentsContext ? componentsContext : this.components;
+            return !!componentsContext[childKey] && componentsContext.hasOwnProperty(childKey);
         },
         /**
          * Get child component by key
          * @param  {Object} childKey key for retrieval
          */
-        c : function (childKey) {
-            return this.childExists(childKey) ? this.components[childKey].inst : null;
+        c : function (childKey, componentsContext) {
+            componentsContext = componentsContext ? componentsContext : this.components;
+            return this.childExists(childKey, componentsContext) ? componentsContext[childKey].inst : null;
         },
         /**
          * Utility function used to determine if the current component
