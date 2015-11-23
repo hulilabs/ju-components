@@ -2,13 +2,13 @@
 # Ju-Components
 This library can be used as a standalone library or as a separate dependencies library, in which case we will need to add the following entry to the require config file:
 
-require.config({
-    paths: {
-        'ju-shared' : 'lib/vendor/components',
-        'ju-components' : 'lib/vendor/components',
-        'ju-mvc' : 'lib/vendor/components'
-    }
-});
+    require.config({
+        paths: {
+            'ju-shared' : 'lib/vendor/components',
+            'ju-components' : 'lib/vendor/components',
+            'ju-mvc' : 'lib/vendor/components'
+        }
+    });
 
 # about ju-components
 Components are self contained blocks whose intention is to be easily reusable, modular and provide a common interface to interact with other components.
