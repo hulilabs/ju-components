@@ -38,6 +38,9 @@ define( [
                 childListeners : [],
                 // Skip when get data is undefined
                 skipFieldOnUndefined : false,
+                // Callback for verifying data emptiness
+                // Implemented due to lists promises behavior on addChild
+                checkDataEmptiness : null,
                 // should trigger an event when the async `setData` operation ends?
                 // see `addChild` and `setData` for more details
                 triggerOnSetDataEnd : false,
@@ -651,8 +654,11 @@ define( [
             this.clear();
 
             if ($.isArray(data)) {
-                results.isEmpty = (data.length === 0);
-                var canSetData = results.success = !results.isEmpty;
+                var checkDataEmptinessFn = this.opts.checkDataEmptiness,
+                    canSetData = results.success = (data.length !== 0);
+
+                results.isEmpty = checkDataEmptinessFn ? checkDataEmptinessFn(data) : this.isEmptyData(data);
+
                 if (canSetData) {
                     // Default item
                     if (this.opts.alwaysEditable && this.defaultItemId) {
@@ -679,6 +685,14 @@ define( [
             // Standard set data result object
             // @see base-ui
             return this.setDataResult(results);
+        },
+        /**
+         * A base list is considered empty if the array-to-set is empty (no elements)
+         * @param  {array}   data data to evaluate
+         * @return {Boolean} emptiness state
+         */
+        isEmptyData : function (data) {
+            return (data.length === 0);
         },
         /**
          * Adds a child for every member in data
