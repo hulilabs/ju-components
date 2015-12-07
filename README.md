@@ -4,9 +4,7 @@ This library can be used as a standalone library or as a separate dependencies l
 
     require.config({
         paths: {
-            'ju-shared' : 'lib/vendor/components',
-            'ju-components' : 'lib/vendor/components',
-            'ju-mvc' : 'lib/vendor/components'
+            'ju-components' : 'lib/vendor/ju-components'
         }
     });
 
@@ -23,11 +21,11 @@ The most important elements are the `resources`, the `children definition` and t
 ### resource map
 
     {
-        cssFile : [ list of css file paths ], 
-        l10n : [ list of l10n keys ], 
-        template : [ list of template paths ], 
-        optionsData : [ list of options data keys ], 
-        appConfig : [ list of app config keys ], 
+        cssFile : [ list of css file paths ],
+        l10n : [ list of l10n keys ],
+        template : [ list of template paths ],
+        optionsData : [ list of options data keys ],
+        appConfig : [ list of app config keys ],
         context : { dictionary of handler_name => { handler options } }
     }
 
@@ -81,7 +79,7 @@ The most important methods are `getData` and `setData`.  Both of them produce/co
 
 And the following component definition in any root component:
 
-    { 
+    {
         name : { component : 'somepath', insertionPoint : 'someInsertionPoint},
         identification : { component : 'somepath', insertionPoint : 'someInsertionPoint}
     }
