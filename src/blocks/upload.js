@@ -17,7 +17,7 @@
  *        plugin, so custom implementations must be done
  */
 define( [
-            'ju-components/blocks/single-template/base',
+            'ju-components/blocks/single-template/base-ui',
             'ju-components/resource/storage/context-storage',
             // Unmapped imports
             'dropzone'

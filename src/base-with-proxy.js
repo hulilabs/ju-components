@@ -15,24 +15,41 @@
 define( [
             'jquery',
             'ju-components/base',
-            'ju-components/base-with-proxy/payload-handler'
+            'ju-components/base-with-proxy/payload-handler',
+            'ju-components/resource/storage/template-storage'
         ],
         function (
             $,
             BaseComponent,
-            PayloadHandler
+            PayloadHandler,
+            TemplateStorage
         ) {
 
     'use strict';
 
     var BaseWithProxy = BaseComponent.extend({
-        init : function () {
+        init : function (args, templatePath, resourcesDef, childrenDef) {
 
             this.setOptions({
                 proxy : null // must be instance, not class
             });
 
-        	this._super.apply(this, arguments);
+        	this._super.apply(this, args);
+
+            this.childrenDef = childrenDef;
+
+            this.addResources(resourcesDef);
+
+            // Single Template
+            if (templatePath) {
+                // Define template
+                this.addResources({
+                    template : [
+                        templatePath
+                    ]
+                });
+                this.templatePath = templatePath;
+            }
 
             this.payloadHandler = PayloadHandler.getInst();
         },
@@ -51,6 +68,16 @@ define( [
             // @TODO: calling this method in the setup method instead of the load,
             // will cause that the data cannot be fetched at the same time as the components resources
             this.fetchDataWithParams.apply(this, params);
+        },
+        /**
+         * Insert template into DOM
+         */
+        configureComponent : function () {
+            // Single Template
+            if (this.templatePath) {
+                var template = TemplateStorage.getInst().get(this.templatePath);
+                this.appendToView(template);
+            }
         },
         /**
          * Retrieves the data from the server
@@ -122,11 +149,6 @@ define( [
         errorFetchingData : function () {
             Logger.error("BaseWithProxy: error fetching data", arguments);
         }
-    });
-
-
-    BaseWithProxy.classMembers({
-
     });
 
     // Exporting module
