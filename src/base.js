@@ -573,9 +573,10 @@ define( [
                 return;
             }
 
-            // Defaults to true if the value was not defined
             if (mergeWithView === undefined) {
-                mergeWithView = true;
+                // For root component default to false
+                // for any other level default to true
+                mergeWithView = !this.isRootComponent;
             }
 
             if (this.isRootComponent) {
@@ -586,15 +587,18 @@ define( [
                 // - Final append to dom happens only the root level at setup completed point
                 //   then all virtual dom (including children) are moved into the dom
 
+                // Store mergeWithView on root component for future appendToDOM
+                this.rootMergeWithView = mergeWithView;
+
                 // Transform template html into virtual dom view
                 this.$view = $(content);
             } else {
-            if (mergeWithView) {
+                if (mergeWithView) {
                     this._mergeViewWithContent(this.$view, content);
-            } else {
-                // Simply append the content to the view
-                this.$view.append(content);
-            }
+                } else {
+                    // Simply append the content to the view
+                    this.$view.append(content);
+                }
             }
         },
 
@@ -603,8 +607,13 @@ define( [
          */
         appendToDOM : function () {
             if (this.isRootComponent) {
-                // Simply append the content to the dom using initial insertion point
-                this.$insertionPoint.append(this.$view);
+                if (this.rootMergeWithView) {
+                    // Merge insertion point and virtual dom root
+                    this._mergeViewWithContent(this.$insertionPoint, this.$view);
+                } else {
+                    // Simply append the content to the dom using initial insertion point
+                    this.$insertionPoint.append(this.$view);
+                }
             } else {
                 Logger.error('appendToDOM : for optimal performance, only a root component can append directly to the dom at load');
             }
@@ -946,9 +955,9 @@ define( [
          * Merges the attributes of the $view top node with the content top node
          * And then merges the children as well
          */
-        _mergeViewWithContent : function (domSpace, content) {
+        _mergeViewWithContent : function ($domSpace, content) {
             var $content = $(content),
-                currentViewClass = domSpace.attr('class') || '',
+                currentViewClass = $domSpace.attr('class') || '',
                 contentClass = $content.attr('class') || '';
 
             // Convert the classes to array
@@ -961,9 +970,9 @@ define( [
             // Remove duplicate class
             contentClass = Util.arrayUnique(contentClass);
 
-            domSpace.attr('class', contentClass.join(' '));
+            $domSpace.attr('class', contentClass.join(' '));
             // We need to merge the top element attributes like classes first and then append the contents
-            domSpace.append($content.contents());
+            $domSpace.append($content.contents());
         },
 
         /**
