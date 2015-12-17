@@ -15,7 +15,8 @@ define([
             'ju-shared/dependency-loader',
             'ju-shared/l10n',
             'ju-components/resource/css-loader',
-            'ju-components/resource/resource-proxy'
+            'ju-components/resource/resource-proxy',
+            'ju-components/util'
         ],
         function (
             $,
@@ -23,7 +24,8 @@ define([
             DependencyLoader,
             L10n,
             CssLoader,
-            ResourceProxy
+            ResourceProxy,
+            ComponentUtils
         ) {
     'use strict';
 
@@ -122,16 +124,26 @@ define([
          * @return promise
          */
         fetchServerData : function (resourceMap) {
-            var resourceProxy = ResourceProxy.getInst(),
-                promise = resourceProxy.getResources({
-                                app_config : resourceMap.appConfig,
-                                options_data : resourceMap.optionsData,
-                                context : resourceMap.context
-                            })()
-                            .then(function (response) {
-                                return response.data.response_data;
-                            });
-            return promise;
+            var nonStaticResources = {
+                app_config : resourceMap.appConfig,
+                options_data : resourceMap.optionsData,
+                context : resourceMap.context
+            };
+
+            var needNonStaticResources = !ComponentUtils.isEmptyObject(nonStaticResources);
+
+            if (needNonStaticResources) {
+                //
+                var resourceProxy = ResourceProxy.getInst(),
+                    promise = resourceProxy.getResources(nonStaticResources)()
+                                .then(function (response) {
+                                    return response.data.response_data;
+                                });
+                return promise;
+            } else {
+                // we won't fetch assets from server, resolve right away
+                return Promise.resolve(null);
+            }
         },
         /**
          * Given an array of css paths to load
