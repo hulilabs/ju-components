@@ -444,6 +444,21 @@ define( [
             this.opts = $.extend.apply($, [true, {}].concat(this.optsCollector).concat([forcedOpts]));
         },
         /**
+         * Merge selectors into the selector dictionary (collector) used by _findLocalElems
+         * @param {object}  selectorsObj selectors dictionary
+         * @param {boolean} overwrite    overwrite stored selectors dictionary (forced)
+         */
+        setSelectors : function (selectorsObj, overwrite) {
+            this.S = this.S || {};
+            overwrite = !!overwrite || false;
+
+            if (overwrite) {
+                this.S = selectorsObj;
+            } else {
+                this.S = $.extend(true, {}, this.S, selectorsObj);
+            }
+        },
+        /**
          * Merge specific resources to the component resource map
          *
          * var RESOURCE_MAP = {
@@ -454,7 +469,6 @@ define( [
          *     appConfig : [],
          *     context : {}
          * };
-         }
          */
         addResources : function (resourceMap) {
             // $.extend does not support nested arrays merge
