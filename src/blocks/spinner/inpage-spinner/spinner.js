@@ -37,7 +37,8 @@ define( [
             this._super.apply(this, arguments);
         },
         configureComponent : function () {
-            this.$view = $(this.opts.containerClass);
+            var template = $(this.opts.containerClass).clone();
+            this.appendToView(template, false);
             this.$view.toggle(true);
         },
         destroy : function () {
