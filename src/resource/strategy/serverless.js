@@ -187,8 +187,11 @@ define([
         _transformToDependencies : function (templatesFilePath) {
             var dependencies = {};
             for (var i = 0; i < templatesFilePath.length; i++) {
-                var key = templatesFilePath[i];
-                dependencies[key] = 'text!' + this.opts.templatePath + key + this.opts.templateExtension;
+                var key = templatesFilePath[i],
+                    filePathIncludesExt = (key.lastIndexOf('/') < key.lastIndexOf('.')),
+                    fileExt = filePathIncludesExt ? '' : this.opts.templateExtension;
+
+                dependencies[key] = 'text!' + this.opts.templatePath + key + fileExt;
             }
             return dependencies;
         },
