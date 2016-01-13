@@ -662,27 +662,27 @@ define( [
 
             // Set non-empty array data
             if (canSetData) {
-            // clear the current components
-            this.clear();
+                // clear the current components
+                this.clear();
 
-                    // Default item
-                    if (this.opts.alwaysEditable && this.defaultItemId) {
-                        this.defaultItemShouldBeDeleted = true;
-                        this.hasDefaultItem = false;
-                    }
-                    // tests if should trigger an event once done setting data
-                    if (!this.opts.triggerOnSetDataEnd) {
-                        // Adds childrens normally, for every data member
-                        // Return array of promises. Can be also false for not set child
+                // Default item
+                if (this.opts.alwaysEditable && this.defaultItemId) {
+                    this.defaultItemShouldBeDeleted = true;
+                    this.hasDefaultItem = false;
+                }
+                // tests if should trigger an event once done setting data
+                if (!this.opts.triggerOnSetDataEnd) {
+                    // Adds childrens normally, for every data member
+                    // Return array of promises. Can be also false for not set child
                     var childrenSetDataPromiseArray = this.setChildrenData(data);
                     if ($.isArray(childrenSetDataPromiseArray)) {
                         results.promise = Promise.all(childrenSetDataPromiseArray);
                     }
-                    } else {
-                        // uses promises to trigger SET_DATA_END once done
-                        // Return single all-promise, resolved after all children are set
-                        results.promise = this.setChildrenDataWithDoneTrigger(data);
-                    }
+                } else {
+                    // uses promises to trigger SET_DATA_END once done
+                    // Return single all-promise, resolved after all children are set
+                    results.promise = this.setChildrenDataWithDoneTrigger(data);
+                }
             } else if (this.opts.alwaysEditable) {
                 // when a list has always editable enabled AND data is empty array or undefined
                 // then no problem, a default placeholder child was added in setup method
