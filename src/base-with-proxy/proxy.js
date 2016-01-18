@@ -20,14 +20,15 @@ define([
         function(
                     $,
                     BaseProxy
-                ){
+                ) {
 
     'use strict';
 
     var BaseComponentProxy = BaseProxy.extend({
-        init : function () {
-        	this.EP = {
-            	API_PREFIX : BaseProxy.EP.API_PREFIX
+        init : function(opts) {
+            this._super.call(this, opts);
+            this.EP = {
+                API_PREFIX : BaseProxy.EP.API_PREFIX
             };
         },
         /**
@@ -37,11 +38,10 @@ define([
          * @return Promise
          * @abstract
          */
-        getPayload : function (data, resolve, reject) {} // jshint ignore:line
+        getPayload : function(data, resolve, reject) {} // jshint ignore:line
     });
 
     // Exports
-    // context.PatientProxy = PatientProxy;
     return BaseComponentProxy;
 
 });
