@@ -124,11 +124,6 @@ define( [
         }
     });
 
-
-    BaseWithProxy.classMembers({
-
-    });
-
     // Exporting module
     return BaseWithProxy;
 

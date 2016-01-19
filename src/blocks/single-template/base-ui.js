@@ -12,23 +12,23 @@
 
 /**
  * Single Template
- * Lightweight implementation directly from base component
+ * More complex implementation from base-UI component
  */
 define( [
-            'ju-components/base',
+            'ju-components/blocks/base-ui',
             'ju-components/resource/storage/template-storage'
         ],
         function (
-            BaseComponent,
+            BaseUIComponent,
             TemplateStorage
         ) {
 
     'use strict';
 
-    var SingleTemplateBaseComponent = BaseComponent.extend({
-    	/**
-    	 * @param args (array) bypass extended constructor arguments
-    	 */
+    var SingleTemplateComponent = BaseUIComponent.extend({
+        /**
+         * @param args (array) bypass extended constructor arguments
+         */
         init : function(args, templatePath, resourcesDef, childrenDef) {
             this._super.apply(this, args);
 
@@ -56,6 +56,6 @@ define( [
         }
     });
 
-    return SingleTemplateBaseComponent;
+    return SingleTemplateComponent;
 
 });
