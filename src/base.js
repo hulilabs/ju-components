@@ -250,6 +250,12 @@ define( [
                         var result =  self.setup.apply(self, args);
                         // This wil return a promise that will be chained in the lifecyle
                         return result;
+	                })
+                    // Insert virtual dom into dom (single insertion point)
+                    .then(function (setupResult) {
+                        self.appendToDOM();
+                        self.fireEventAndNotify(BaseComponent.EV.DOM_READY);
+                        return setupResult;
                     });
 
                 // This catch will capture any error during the loading and setup process
@@ -438,6 +444,21 @@ define( [
             this.opts = $.extend.apply($, [true, {}].concat(this.optsCollector).concat([forcedOpts]));
         },
         /**
+         * Merge selectors into the selector dictionary (collector) used by _findLocalElems
+         * @param {object}  selectorsObj selectors dictionary
+         * @param {boolean} overwrite    overwrite stored selectors dictionary (forced)
+         */
+        setSelectors : function (selectorsObj, overwrite) {
+            this.S = this.S || {};
+            overwrite = !!overwrite || false;
+
+            if (overwrite) {
+                this.S = selectorsObj;
+            } else {
+                this.S = $.extend(true, {}, this.S, selectorsObj);
+            }
+        },
+        /**
          * Merge specific resources to the component resource map
          *
          * var RESOURCE_MAP = {
@@ -448,7 +469,6 @@ define( [
          *     appConfig : [],
          *     context : {}
          * };
-         }
          */
         addResources : function (resourceMap) {
             // $.extend does not support nested arrays merge
@@ -559,26 +579,57 @@ define( [
         },
 
         /**
-         * Appends the current DOM element
-         *
+         * Appends the current element to this component view
          */
         appendToView : function (content, mergeWithView) {
-
             if (!content) {
                 Logger.error('BaseComponent: cannot append empty content');
                 return;
             }
 
-            // Defaults to true if the value was not defined
             if (mergeWithView === undefined) {
-                mergeWithView = true;
+                // For root component default to false
+                // for any other level default to true
+                mergeWithView = !this.isRootComponent;
             }
 
-            if (mergeWithView) {
-                this._mergeViewWithContent(content);
+            if (this.isRootComponent) {
+                // - Root view is changed into a virtual dom space (enables binding, tree traversal and manipulations)
+                //   Insertion point will remain at root component as the only reference to the dom append point
+                // - Children will receive virtual dom references at childrenSetup (insertion point and view)
+                //   so all children are setup inside the virtual dom space too
+                // - Final append to dom happens only the root level at setup completed point
+                //   then all virtual dom (including children) are moved into the dom
+
+                // Store mergeWithView on root component for future appendToDOM
+                this.rootMergeWithView = mergeWithView;
+
+                // Transform template html into virtual dom view
+                this.$view = $(content);
             } else {
-                // Simply append the content to the view
-                this.$view.append(content);
+                if (mergeWithView) {
+                    this._mergeViewWithContent(this.$view, content);
+                } else {
+                    // Simply append the content to the view
+                    this.$view.append(content);
+                }
+            }
+        },
+
+        /**
+         * Appends this component to the dom
+         */
+        appendToDOM : function () {
+            if (this.isRootComponent) {
+                if (this.rootMergeWithView) {
+                    // Merge insertion point and virtual dom root
+                    this._mergeViewWithContent(this.$insertionPoint, this.$view);
+                } else {
+                    // Simply append the content to the dom using initial insertion point
+                    this.$insertionPoint.append(this.$view);
+                }
+            } else {
+                Logger.error('appendToDOM : for optimal performance, only a root component can append directly to the dom at load');
             }
         },
         /**
@@ -918,9 +969,9 @@ define( [
          * Merges the attributes of the $view top node with the content top node
          * And then merges the children as well
          */
-        _mergeViewWithContent : function (content) {
+        _mergeViewWithContent : function ($domSpace, content) {
             var $content = $(content),
-                currentViewClass = this.$view.attr('class') || '',
+                currentViewClass = $domSpace.attr('class') || '',
                 contentClass = $content.attr('class') || '';
 
             // Convert the classes to array
@@ -933,9 +984,9 @@ define( [
             // Remove duplicate class
             contentClass = Util.arrayUnique(contentClass);
 
-            this.$view.attr('class', contentClass.join(' '));
+            $domSpace.attr('class', contentClass.join(' '));
             // We need to merge the top element attributes like classes first and then append the contents
-            this.$view.append($content.contents());
+            $domSpace.append($content.contents());
         },
 
         /**
@@ -1234,7 +1285,8 @@ define( [
 
     BaseComponent.classMembers({
         EV: {
-            READY : 'ready'
+            READY : 'ready',
+            DOM_READY : 'dom_ready'
         },
         /**
          * Defines the default error handler for all the components, if no other is provided

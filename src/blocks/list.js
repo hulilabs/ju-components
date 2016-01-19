@@ -648,34 +648,45 @@ define( [
         setData : function (data) {
             this.isSettingData = true;
 
-            var results = BaseUIComponent.getResultDefaultObject('isEmpty','success');
+            var results = BaseUIComponent.getResultDefaultObject('isEmpty','success'),
+                checkDataEmptinessFn = this.opts.checkDataEmptiness;
 
-            // clear the current components
-            this.clear();
+            // Define emptiness for any scenario
+            results.isEmpty = checkDataEmptinessFn ? checkDataEmptinessFn(data) : this.isEmptyData(data);
 
-            if ($.isArray(data)) {
-                var checkDataEmptinessFn = this.opts.checkDataEmptiness,
-                    canSetData = results.success = (data.length !== 0);
+            // Ability of setting data is determined also by always editable behavior
+            // - always editable enabled and empty array data: a default child was added in setup method
+            // - not always editable, then only set data if data is an array (empty or not)
+            var canSetData = results.success = ($.isArray(data) &&
+                    ((this.opts.alwaysEditable && !results.isEmpty) || !this.opts.alwaysEditable));
 
-                results.isEmpty = checkDataEmptinessFn ? checkDataEmptinessFn(data) : this.isEmptyData(data);
+            // Set non-empty array data
+            if (canSetData) {
+                // clear the current components
+                this.clear();
 
-                if (canSetData) {
-                    // Default item
-                    if (this.opts.alwaysEditable && this.defaultItemId) {
-                        this.defaultItemShouldBeDeleted = true;
-                        this.hasDefaultItem = false;
-                    }
-                    // tests if should trigger an event once done setting data
-                    if (!this.opts.triggerOnSetDataEnd) {
-                        // Adds childrens normally, for every data member
-                        // Return array of promises. Can be also false for not set child
-                        results.promise = Promise.all(this.setChildrenData(data));
-                    } else {
-                        // uses promises to trigger SET_DATA_END once done
-                        // Return single all-promise, resolved after all children are set
-                        results.promise = this.setChildrenDataWithDoneTrigger(data);
-                    }
+                // Default item
+                if (this.opts.alwaysEditable && this.defaultItemId) {
+                    this.defaultItemShouldBeDeleted = true;
+                    this.hasDefaultItem = false;
                 }
+                // tests if should trigger an event once done setting data
+                if (!this.opts.triggerOnSetDataEnd) {
+                    // Adds childrens normally, for every data member
+                    // Return array of promises. Can be also false for not set child
+                    var childrenSetDataPromiseArray = this.setChildrenData(data);
+                    if ($.isArray(childrenSetDataPromiseArray)) {
+                        results.promise = Promise.all(childrenSetDataPromiseArray);
+                    }
+                } else {
+                    // uses promises to trigger SET_DATA_END once done
+                    // Return single all-promise, resolved after all children are set
+                    results.promise = this.setChildrenDataWithDoneTrigger(data);
+                }
+            } else if (this.opts.alwaysEditable) {
+                // when a list has always editable enabled AND data is empty array or undefined
+                // then no problem, a default placeholder child was added in setup method
+                results.success = true;
             } else {
                 Logger.error("ListComponent: cannot set data that isn't an array");
             }
@@ -692,7 +703,7 @@ define( [
          * @return {Boolean} emptiness state
          */
         isEmptyData : function (data) {
-            return (data.length === 0);
+            return (!$.isArray(data) || data.length === 0);
         },
         /**
          * Adds a child for every member in data
