@@ -942,6 +942,25 @@ define( [
             return this.components;
         },
         /**
+         * Search for child key in provided context using child component instance as filter
+         * @param  {object} childCompInst     child component instance
+         * @param  {array}  componentsContext components pool (default: this.component)
+         * @return {[type]}                   child key in components context
+         */
+        getChildKey : function (childCompInst, componentsContext) {
+            var childKey = null;
+            componentsContext = componentsContext ? componentsContext : this.components;
+
+            for (var k in componentsContext) {
+                if (componentsContext.hasOwnProperty(k) && componentsContext[k] === childCompInst) {
+                    childKey = k;
+                    break;
+                }
+            }
+
+            return childKey;
+        },
+        /**
          * Check if key is defined as a child component
          * @param  {Object} childKey key for retrieval
          */
@@ -1184,10 +1203,10 @@ define( [
          * Destroys this component information, including children
          * DOM elements and bindings
          */
-        destroy : function (removeViewFromDOM, markAsRootDelete) {
+        destroy : function (removeViewFromDOM, isRootDelete) {
 
             var localRemoveView, childrenRemoveView;
-            markAsRootDelete = (typeof markAsRootDelete === 'boolean') ? markAsRootDelete : true;
+            isRootDelete = (typeof isRootDelete === 'boolean') ? isRootDelete : true;
 
             // Assign default value to var
             if (removeViewFromDOM === undefined) {
@@ -1201,7 +1220,7 @@ define( [
             this.eachChildrenComponents('destroy', childrenRemoveView, false);
 
             // Then remove from dom only if
-            if (localRemoveView && markAsRootDelete) {
+            if (localRemoveView && isRootDelete) {
                 // Removes all the handlers and the view itself from the DOM
                 if (this.$insertionPoint) {
                     // We need to check if the $view is already set in case that
@@ -1218,33 +1237,16 @@ define( [
          * @param  {Boolean} removeChildFromDOM  control child remove from dom
          * @return {Boolean} destroy success
          */
-        destroyChild : function(keyOrChild, removeChildFromDOM, componentsPool) {
+        destroyChild : function(childKey, removeChildFromDOM, componentsContext) {
+            componentsContext = componentsContext ? componentsContext : this.components;
+
             var destroyed = false,
-                childComp = null;
+                childComp = this.c(childKey, componentsContext);
 
-            componentsPool = componentsPool ? componentsPool : this.components;
-
-            // Key provided
-            if ('string' === typeof keyOrChild) {
-                childComp = this.c(keyOrChild);
-                if (childComp) {
-                    childComp.destroy(removeChildFromDOM, true);
-                    delete componentsPool[keyOrChild];
-                    destroyed = true;
-                }
-            } else {
-                // Child instance as argument
-                childComp = keyOrChild;
+            if (childComp) {
                 childComp.destroy(removeChildFromDOM, true);
-                for (var k in componentsPool) {
-                    if (componentsPool.hasOwnProperty(k)) {
-                        if (componentsPool[k].inst === keyOrChild) {
-                            delete componentsPool[k];
-                            destroyed = true;
-                            break;
-                        }
-                    }
-                }
+                delete componentsContext[childKey];
+                destroyed = true;
             }
 
             return destroyed;
@@ -1258,14 +1260,11 @@ define( [
          */
         removeChild : function (childKey /* , dettachBeforeDestroy */) {
             // dettach to avoid backbone triggers on destroy
-            var destroyed = false,
-                dettachedChild = this.detachChild(childKey);
+            var dettachedChild = this.detachChild(childKey),
+                componentsContext = dettachedChild ? this.detachedComponents : this.components;
             // dettached elements reference is kept in this.detachedComponents
             // this.components references was previously moved
-            if (dettachedChild) {
-                destroyed = this.destroyChild(dettachedChild, true, this.detachedComponents);
-            }
-            return destroyed;
+            return this.destroyChild(childKey, true, componentsContext);
         },
 
         /**
@@ -1275,9 +1274,10 @@ define( [
          * @return {Object}          detached component or null if not a member of this.detachedComponents
          */
         detachChild : function(childKey /* , storeDetached */) {
-            var dettachedChild = null;
+            var dettachedChild = null,
+                moveSuccessful = ComponentUtil.moveProperty(childKey, this.components, this.detachedComponents);
             // moves member `childKey` from `this.components` to `this.detachedComponents`
-            if (ComponentUtil.moveProperty(childKey, this.components, this.detachedComponents)) {
+            if (moveSuccessful) {
                 var child = this.detachedComponents[childKey],
                     dettachedChild = (child && child.inst) ? child.inst : null;
                 if (dettachedChild) {
