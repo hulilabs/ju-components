@@ -51,20 +51,26 @@ define( [
             this.addResources(resourcesDef);
             this.addResources(RESOURCE_MAP);
 
-            this.addResources({
-                template : [
-                    templatePath
-                ]
-            });
-
-            this.templatePath = templatePath;
+            // Single Template
+            if (templatePath) {
+                // Define template
+                this.addResources({
+                    template : [
+                        templatePath
+                    ]
+                });
+                this.templatePath = templatePath;
+            }
 
             // L10n labels
             this.appendL10n(this.opts.emptytext);
         },
         configureComponent : function () {
-            var template = TemplateStorage.getInst().get(this.templatePath);
-            this.appendToView(template);
+            // Single Template
+            if (this.templatePath) {
+                var template = TemplateStorage.getInst().get(this.templatePath);
+                this.appendToView(template);
+            }
 
             // Setup empty text label
             if (this.opts.emptytext) {

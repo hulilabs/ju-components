@@ -22,7 +22,7 @@ define( [
             require,
             $,
             ObservableClass,
-            Editable,
+            EditableComponent,
             ListComponent,
             UploadAreaComponent,
             ChangesBag
@@ -45,8 +45,8 @@ define( [
             var modifiedFn = $.proxy(this.modifiedHandler, this);
 
             // Editable fields
-            this.backbone.on(Editable.EV.CHANGED, modifiedFn);
-            this.backbone.on(Editable.EV.EDIT_MODE_ACTIVATED, $.proxy(this.editModeHandler, this));
+            this.backbone.on(EditableComponent.EV.CHANGED, modifiedFn);
+            this.backbone.on(EditableComponent.EV.EDIT_MODE_ACTIVATED, $.proxy(this.editModeHandler, this));
 
             // Lists
             this.backbone.on(ListComponent.EV.CHILD_ADDED, modifiedFn);

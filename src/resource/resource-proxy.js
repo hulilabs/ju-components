@@ -9,7 +9,6 @@
  * (c) Huli Inc
  */
 
-
 define([
             'jquery',
             'ju-shared/base-proxy'
@@ -22,30 +21,32 @@ define([
     'use strict';
 
     var ResourcesProxy = BaseProxy.extend({
-        init : function () {
+        init : function(opts) {
+            this._super(opts);
             /*
                 Resources related paths
              */
             this.EP = {};
             this.EP.RESOURCES_API_PREFIX = BaseProxy.EP.API_PREFIX + 'component/resource';
         },
-        getResources : function (resources, successCallback, errorCallback) {
+
+        getResources : function(resources, successCallback, errorCallback) {
 
             var self = this,
-                promiseFn = function () {
-                    return new Promise(function (resolve, reject) {
+                promiseFn = function() {
+                    return new Promise(function(resolve, reject) {
                         var params = {
                             url : self.EP.RESOURCES_API_PREFIX,
                             data: resources,
                             type: 'POST',
-                            success : function () {
+                            success : function() {
                                 var args = arguments;
                                 if (successCallback) {
                                     successCallback.apply(this, args);
                                 }
                                 resolve.apply(self, args);
                             },
-                            error : function () {
+                            error : function() {
                                 if (errorCallback) {
                                     errorCallback.apply(this, arguments);
                                 }
@@ -58,7 +59,6 @@ define([
             return promiseFn;
         }
     });
-
 
     // Exports
     return ResourcesProxy;

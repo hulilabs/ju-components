@@ -558,8 +558,10 @@ define( [
         emptyList : function () {
             var isEmptyList = this.isEmptyList();
             if (isEmptyList) {
-                // We only fire the events when we are not setting data programatically to the component
-                if (!this.isSettingData) {
+                // We only fire the events when:
+                // - we are not setting data programatically
+                // - we are not destroying this component (avoid being mark as changed)
+                if (!this.isSettingData && !this.isDestroying) {
                     this.fireEventAndNotify(ListComponent.EV.CLEARED);
                 }
             }
@@ -812,6 +814,7 @@ define( [
          * Need to destroy all the items in the list
          */
         destroy : function () {
+            this.isDestroying = true;
             this._super();
             // TODO: destroy all the components in the list as well
             this.clear();
