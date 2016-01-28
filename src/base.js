@@ -1205,6 +1205,7 @@ define( [
                     // We need to check if the $view is already set in case that
                     // the destroy method has been called before the setup one
                     // (i.e.) the user is changing tabs too quickly
+
                     // @warn: if merged with insertion point on appendToView, the whole insertion point is removed
                     this.$view.remove();
                 }
