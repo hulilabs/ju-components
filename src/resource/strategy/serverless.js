@@ -16,18 +16,26 @@ define([
             'ju-shared/l10n',
             'ju-components/resource/css-loader',
             'ju-components/resource/resource-proxy',
-            'ju-components/util'
+            'ju-components/resource/storage/options-data-storage'
         ],
-        function (
+        function(
             $,
             Class,
             DependencyLoader,
             L10n,
             CssLoader,
             ResourceProxy,
-            ComponentUtils
+            OptionsDataStorage
         ) {
     'use strict';
+
+    // Constants
+    var MSG_LOADING_L10N = 'ResourceLoader: loading language:',
+        MSG_NOT_LOADED_L10N = 'ResourceLoader: L10n key is not loaded yet:',
+        MSG_LOADING_OPTIONS_DATA = 'ResourceLoader: loading options data:',
+        MSG_NOT_LOADED_OPTIONS_DATA = 'ResourceLoader: Optins data key is not loaded yet:',
+        MSG_LOADING_CLIENT_VAR = 'ResourceLoader: loading client var:',
+        MSG_UNKNOWN_CLIENT_VAR = 'ResourceLoader: Client var is not loadable:';
 
     /**
      * This strategy loads the static resources from public accesible
@@ -36,18 +44,20 @@ define([
      * This is intended to be the default loader
      * if no server side resource provider is available.
      *
-     * The server data such as options_data, app_config and context
-     * will continue to hit an server endpoint to get the data
-     *
+     * Server data such as app_config and context is not be supported
      */
     var ServerLessLoaderStrategy = Class.extend({
-        init : function (opts) {
+        init : function(opts, staticAssetsResourceManagerMap) {
 
             this.opts = $.extend({
-                templatePath : '/tmpl/',
+                templatePath : '/templates/',
                 templateExtension : '.html'
             }, opts);
 
+            // Preload default static assets
+            if (staticAssetsResourceManagerMap) {
+                this.defaultResourcePromise = this.fetchResources(staticAssetsResourceManagerMap);
+            }
         },
         /**
          * Fetch the resources given the resource map
@@ -57,33 +67,43 @@ define([
                 l10n : resourceCollectorMap.l10n,
                 cssFile : resourceCollectorMap.cssFile,
                 templates : resourceCollectorMap.template,
+                options_data : resourceCollectorMap.optionsData
 
-                // Data related resources
+                // not supported resources
                 app_config : resourceCollectorMap.appConfig,
-                options_data : resourceCollectorMap.optionsData,
                 context : resourceCollectorMap.context
             };
          */
-        fetchResources : function (resourceMap) {
+        fetchResources : function(resourceMap) {
+            var self = this;
 
-            var self = this,
-                childrenReadyPromises = [],
-                promise = new Promise(function (resolve, reject) {
+            // Wait until default resources are loaded
+            if (self.defaultResourcePromise) {
+                return self.defaultResourcePromise.then(function() {
+                    self.defaultResourcePromise = null;
+                    return self.fetchResources(resourceMap);
+                });
+            }
 
-                    var staticAssetsPromise = self.fetchStaticAssets(resourceMap),
-                        serverDataPromise = self.fetchServerData(resourceMap);
+            // Make resource map always valid for this strategy
+            resourceMap = $.extend(true, {
+                l10n : [],
+                cssFile : [],
+                templates : [],
+                options_data : []
+            }, resourceMap);
 
-                    childrenReadyPromises.push(staticAssetsPromise);
-                    childrenReadyPromises.push(serverDataPromise);
+            // Fetching resources
+            var promise = new Promise(function(resolve, reject) {
+
+                    var staticAssetsPromise = self.fetchStaticAssets(resourceMap);
 
                     // Waits until all the children are ready with their children
-                    var childrenReadyPromise = Promise.all(childrenReadyPromises);
-
-                    childrenReadyPromise
-                        .then(function (values) {
+                    staticAssetsPromise
+                        .then(function(values) {
 
                             var response = {};
-                            $.each(values, function () {
+                            $.each(values, function() {
                                 $.extend(response, this);
                             });
 
@@ -93,80 +113,125 @@ define([
                         ['catch'](reject);
 
                 });
-                return promise;
+
+            return promise;
         },
         /**
          * Loads the static assets:
          * l10n
          * cssFiles
          * templates
+         * optionsData
          *
          * @param  object resourceMap
          * @return promise
          */
-        fetchStaticAssets : function (resourceMap) {
+        fetchStaticAssets : function(resourceMap) {
+            var resourcesReadyPromises = [];
+
             // Request the CSS files using the CSS loader
             this._fetchCssFiles(resourceMap.cssFile);
-            this._fetchL10n(resourceMap.l10n);
-            var promise = this._fetchTemplates(resourceMap.templates)
-                            .then(function (templatesDef) {
+
+            // Request L10n client vars
+            var l10nPromise = this._fetchClientVars(resourceMap.l10n,
+                                                    L10n,
+                                                    MSG_LOADING_L10N,
+                                                    MSG_NOT_LOADED_L10N);
+            resourcesReadyPromises.push(l10nPromise);
+
+            // Request options data client vars
+            var optionsDataPromise = this._fetchClientVars(resourceMap.options_data,
+                                                            OptionsDataStorage.getInst(),
+                                                            MSG_LOADING_OPTIONS_DATA,
+                                                            MSG_NOT_LOADED_OPTIONS_DATA);
+            resourcesReadyPromises.push(optionsDataPromise);
+
+            // Request template file using dependency loader
+            var templatesPromise = this._fetchTemplates(resourceMap.templates)
+                            .then(function(templatesDef) {
                                 return { templates : templatesDef };
                             });
-            return promise;
-        },
-        /**
-         * Loads data from the server:
-         * app_config
-         * options_data
-         * context
-         *
-         * @param  object resourceMap
-         * @return promise
-         */
-        fetchServerData : function (resourceMap) {
-            var nonStaticResources = {
-                app_config : resourceMap.appConfig,
-                options_data : resourceMap.optionsData,
-                context : resourceMap.context
-            };
+            resourcesReadyPromises.push(templatesPromise);
 
-            var needNonStaticResources = !ComponentUtils.isEmptyObject(nonStaticResources);
-
-            if (needNonStaticResources) {
-                //
-                var resourceProxy = ResourceProxy.getInst(),
-                    promise = resourceProxy.getResources(nonStaticResources)()
-                                .then(function (response) {
-                                    return response.data.response_data;
-                                });
-                return promise;
-            } else {
-                // we won't fetch assets from server, resolve right away
-                return Promise.resolve(null);
-            }
+            return Promise.all(resourcesReadyPromises);
         },
         /**
          * Given an array of css paths to load
          * it will use the CSSLoader to append each file individually in the head
          */
-        _fetchCssFiles : function (cssFileArray) {
+        _fetchCssFiles : function(cssFileArray) {
             var cssLoader = CssLoader.getInst();
             cssLoader.getIndividualFiles(cssFileArray);
         },
         /**
-         * For now, we will just validate that the requested l10n keys are loading into the
-         * L10n manager
+         * On client var dependency loaded handler
+         * @param  {object}            clientVarDef      loaded client var definition
+         * @param  {ClientVarsManager} clientVarsManager
+         * @param  {string}            msgLoading        loading message
+         * @param  {array}             dependecies       array of loaded client side variables
          */
-        _fetchL10n : function (l10nKeys) {
-            var allValid = true;
-            for (var index = 0; index < l10nKeys.length; index++ ) {
-                var key = l10nKeys[index];
-                allValid = L10n.exists(key);
-                if (!allValid) {
-                    Logger.error('ResourceLoader: L10n key is not loaded yet:', key);
-                    break;
+        _onClientVarDependenciesLoaded : function(clientVarDef, clientVarsManager, msgLoading, dependecies) {
+            log(msgLoading, dependecies);
+            clientVarsManager.append(dependecies.defaultVars.instance);
+        },
+        /**
+         * Fetch client side vars by keys or accesible client side files
+         * @param  {array}             definitions       array of keys (static var key for retrieval)
+         *                                               array of objects with paths (files to load)
+         * @param  {ClientVarsManager} clientVarsManager
+         * @param  {string}            msgLoading        loading message
+         * @param  {string}            msgError          error message
+         * @return {Promise}                             fetching promise
+         */
+        _fetchClientVars : function(definitions, clientVarsManager, msgLoading, msgError) {
+            var self = this,
+                promise = null,
+                clientVarsReadyPromise = [],
+                allValid = true,
+                clientVar = null;
+
+            // Loading message can't be empty
+            msgLoading = msgLoading ? msgLoading : MSG_LOADING_CLIENT_VAR;
+
+            for (var i in definitions) {
+                clientVar = definitions[i];
+                if (typeof clientVar === 'string') {
+                    var key = clientVar,
+                        keyExists = clientVarsManager.exists(key);
+                    if (!keyExists) {
+                        allValid = false;
+                        break;
+                    }
+                } else if (typeof clientVar === 'object') {
+                    var clientVarDef = clientVar;
+                    if (clientVarDef.path) {
+                        clientVarDef.promise = DependencyLoader.getInst().getDependencies({
+                            defaultVars : clientVarDef.path
+                        }).then(self._onClientVarDependenciesLoaded.bind(self, clientVarDef, clientVarsManager, msgLoading));
+                        clientVarsReadyPromise.push(clientVarDef.promise);
+                    } else {
+                        allValid = false;
+                        break;
+                    }
+                } else {
+                    Logger.error(MSG_UNKNOWN_CLIENT_VAR, clientVar);
                 }
             }
+
+            if (clientVarsReadyPromise.length > 0) {
+                promise = Promise.all(clientVarsReadyPromise);
+            } else {
+                promise = new Promise(function(resolve, reject) {
+                    if (allValid) {
+                        resolve();
+                    } else if (!allValid) {
+                        reject();
+                        Logger.error(msgError, clientVar);
+                    }
+                });
+            }
+
+            return promise;
         },
         /**
          * Use the dependency manager to fetch the templates and transform them
@@ -175,16 +240,17 @@ define([
          * @param  Array templatesFilePath
          * @return promise
          */
-        _fetchTemplates : function (templatesFilePath) {
-            var self =  this,
-                templatesFetchInfo = this._transformToDependencies(templatesFilePath);
-            var dependenciesPromise = DependencyLoader.getInst().getDependencies(templatesFetchInfo);
-            return dependenciesPromise.then(function (dependencies) {
-                self._transformToResourceMap(dependencies);
+        _fetchTemplates : function(templatesFilePath) {
+            var self = this,
+                templatesFetchInfo = this._transformTemplateFilePathsToDependencies(templatesFilePath),
+                dependenciesPromise = DependencyLoader.getInst().getDependencies(templatesFetchInfo);
+
+            return dependenciesPromise.then(function(dependencies) {
+                self._transformDependenciesToResourceMap(dependencies);
                 return dependencies;
             });
         },
-        _transformToDependencies : function (templatesFilePath) {
+        _transformTemplateFilePathsToDependencies : function(templatesFilePath) {
             var dependencies = {};
             for (var i = 0; i < templatesFilePath.length; i++) {
                 var key = templatesFilePath[i],
@@ -195,7 +261,7 @@ define([
             }
             return dependencies;
         },
-        _transformToResourceMap : function (dependencies) {
+        _transformDependenciesToResourceMap : function(dependencies) {
             for (var i in dependencies) {
                 dependencies[i] = dependencies[i].instance;
             }
