@@ -35,17 +35,23 @@ define( [
 
             this.addResources(resourcesDef);
 
-            this.addResources({
-                template : [
-                    templatePath
-                ]
-            });
-
-            this.templatePath = templatePath;
+            // Single Template
+            if (templatePath) {
+                // Define template
+                this.addResources({
+                    template : [
+                        templatePath
+                    ]
+                });
+                this.templatePath = templatePath;
+            }
         },
         configureComponent : function () {
-            var template = TemplateStorage.getInst().get(this.templatePath);
-            this.appendToView(template);
+            // Single Template
+            if (this.templatePath) {
+                var template = TemplateStorage.getInst().get(this.templatePath);
+                this.appendToView(template);
+            }
         }
     });
 

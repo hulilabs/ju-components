@@ -69,6 +69,11 @@ define([
          */
         get : function(filePathArray, callback, timeoutCallback, timeout) {
 
+            if (!filePathArray || !filePathArray.length) {
+                // Nothing to load...
+                return;
+            }
+
             // obtains filenames to get, in encoded format
             var encodedFileNames = this.getEncodedFileNames(filePathArray);
 

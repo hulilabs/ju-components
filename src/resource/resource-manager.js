@@ -23,6 +23,7 @@ define([
             'ju-shared/l10n',
             'ju-shared/app-config-manager',
             'ju-shared/client-vars-manager',
+            'ju-shared/util',
             'ju-components/resource/storage/template-storage',
             'ju-components/resource/storage/options-data-storage',
             'ju-components/resource/storage/context-storage',
@@ -36,10 +37,10 @@ define([
             L10n,
             AppConfig,
             ClientVarsManager,
+            SharedUtil,
             TemplateStorage,
             OptionsDataStorage,
-            ContextStorage,
-            ComponentUtil
+            ContextStorage
         ) {
     'use strict';
 
@@ -93,7 +94,10 @@ define([
 
             var resourcePromise;
 
-            if (this.checkResourceMapEmpty(resourceMap)) {
+            // Remove empty map values so we don't make an unnecessary request to the server
+            SharedUtil.sanitizeJson(resourceMap);
+
+            if ($.isEmptyObject(resourceMap)) {
                 log('ResourceManager: no resources to fetch');
                 // Resolve a promise inmediatelly because the are no resources to fetch
                 resourcePromise = Promise.resolve(null);
@@ -124,24 +128,12 @@ define([
             return resourcePromise;
         },
         /**
-         *
-         *
-         * @return {object}
-         */
-        /**
          * Gets the options data object from the storage given the key
          * @param  {string} key to retrieve the data
          * @return {object}     [description]
          */
         getOptionsData : function (key) {
             return OptionsDataStorage.getInst().get(key);
-        },
-        /**
-         * Checks if the input resource map is empty
-         * @return {boolean}
-         */
-        checkResourceMapEmpty : function (resourceMap) {
-            return ComponentUtil.isEmptyObject(resourceMap);
         }
     });
 
