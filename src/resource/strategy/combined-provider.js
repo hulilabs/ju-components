@@ -40,7 +40,7 @@ define([
      * will continue to hit an server endpoint to get the data
      *
      */
-    var ServerLessLoaderStrategy = Class.extend({
+    var CombinedLoaderStrategy = Class.extend({
         init : function(opts) {
 
             this.opts = $.extend({
@@ -204,6 +204,6 @@ define([
     });
 
     // Exports
-    return ServerLessLoaderStrategy;
+    return CombinedLoaderStrategy;
 
 });
