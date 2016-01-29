@@ -16,7 +16,6 @@ define([
             'ju-shared/l10n',
             'ju-components/resource/css-loader',
             'ju-components/resource/resource-proxy',
-            'ju-components/resource/storage/options-data-storage',
             'ju-components/util'
         ],
         function(
@@ -26,24 +25,26 @@ define([
             L10n,
             CssLoader,
             ResourceProxy,
-            OptionsDataStorage,
             ComponentUtils
         ) {
     'use strict';
 
     /**
-     * This strategy does a combined approach for loading resources:
-     * - static resources (l10n, css, templates, optionsData)
-     *      from public accesible folders from
-     *      the client side in the local application
-     * - server data (optionsData, app_config and context)
-     *      hit server endpoint to get the data
+     * This strategy loads the static resources from public accesible
+     * folders from the client side in the local application
+     * i.e. without a server.
+     * This is intended to be the default loader
+     * if no server side resource provider is available.
+     *
+     * The server data such as options_data, app_config and context
+     * will continue to hit an server endpoint to get the data
+     *
      */
     var ServerLessLoaderStrategy = Class.extend({
         init : function(opts) {
 
             this.opts = $.extend({
-                templatePath : '/templates/',
+                templatePath : '/tmpl/',
                 templateExtension : '.html'
             }, opts);
 
@@ -106,11 +107,7 @@ define([
         fetchStaticAssets : function(resourceMap) {
             // Request the CSS files using the CSS loader
             this._fetchCssFiles(resourceMap.cssFile);
-            // Request L10n client vars
-            this._fetchClientVars(resourceMap.l10n, L10n, 'ResourceLoader: L10n key is not loaded yet:');
-            // Request options data client vars
-            this._fetchClientVars(resourceMap.optionsData, OptionsDataStorage, 'ResourceLoader: Optins data key is not loaded yet:');
-            // Request template file using dependency loader
+            this._fetchL10n(resourceMap.l10n);
             var promise = this._fetchTemplates(resourceMap.templates)
                             .then(function(templatesDef) {
                                 return { templates : templatesDef };
@@ -157,15 +154,16 @@ define([
             cssLoader.getIndividualFiles(cssFileArray);
         },
         /**
-         * For now, we will just validate that the requested client var exists in their manager or storage
+         * For now, we will just validate that the requested l10n keys are loading into the
+         * L10n manager
          */
-        _fetchClientVars : function(keys, clientVarsManager, msg) {
+        _fetchL10n : function(l10nKeys) {
             var allValid = true;
-            for (var index = 0; index < keys.length; index++) {
-                var key = keys[index];
-                allValid = clientVarsManager.exists(key);
+            for (var index = 0; index < l10nKeys.length; index++) {
+                var key = l10nKeys[index];
+                allValid = L10n.exists(key);
                 if (!allValid) {
-                    Logger.error(msg, key);
+                    Logger.error('ResourceLoader: L10n key is not loaded yet:', key);
                     break;
                 }
             }
