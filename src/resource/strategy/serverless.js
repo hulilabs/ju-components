@@ -184,54 +184,70 @@ define([
          * @return {Promise}                             fetching promise
          */
         _fetchClientVars : function(definitions, clientVarsManager, msgLoading, msgError) {
-            var self = this,
-                promise = null,
-                clientVarsReadyPromise = [],
-                allValid = true,
-                clientVar = null;
-
             // Loading message can't be empty
             msgLoading = msgLoading ? msgLoading : MSG_LOADING_CLIENT_VAR;
+
+            var promise = new Promise(this._fetchClientVarsDefinitions.bind(this, definitions, clientVarsManager, msgLoading));
+                promise['catch'](function(clientVar) {
+                    Logger.error(msgError, clientVar);
+                });
+
+            return promise;
+        },
+        _fetchClientVarsDefinitions : function(definitions, clientVarsManager, msgLoading, resolve, reject) {
+            var clientVarsReadyPromise = [],
+                clientVar = null,
+                promise = null;
 
             for (var i in definitions) {
                 clientVar = definitions[i];
                 if (typeof clientVar === 'string') {
-                    var key = clientVar,
-                        keyExists = clientVarsManager.exists(key);
-                    if (!keyExists) {
-                        allValid = false;
-                        break;
-                    }
+                    promise = this._fetchClientVarByKey(clientVar, clientVarsManager);
                 } else if (typeof clientVar === 'object') {
-                    var clientVarDef = clientVar;
-                    if (clientVarDef.path) {
-                        clientVarDef.promise = DependencyLoader.getInst().getDependencies({
-                            defaultVars : clientVarDef.path
-                        }).then(self._onClientVarDependenciesLoaded.bind(self, clientVarDef, clientVarsManager, msgLoading));
-                        clientVarsReadyPromise.push(clientVarDef.promise);
-                    } else {
-                        allValid = false;
-                        break;
-                    }
+                    promise = this._fetchClientVarByDefinition(clientVar, clientVarsManager, msgLoading);
                 } else {
-                    Logger.error(MSG_UNKNOWN_CLIENT_VAR, clientVar);
+                    reject(clientVar);
+                    // Leave completely, do not run after-for
+                    return;
                 }
+                clientVarsReadyPromise.push(promise);
             }
 
-            if (clientVarsReadyPromise.length > 0) {
-                promise = Promise.all(clientVarsReadyPromise);
-            } else {
-                promise = new Promise(function(resolve, reject) {
-                    if (allValid) {
-                        resolve();
-                    } else if (!allValid) {
-                        reject();
-                        Logger.error(msgError, clientVar);
-                    }
-                });
-            }
-
-            return promise;
+            Promise.all(clientVarsReadyPromise).then(function() {
+                resolve();
+            })
+            ['catch'](function(clientVar) {
+                reject(clientVar);
+            });
+        },
+        _fetchClientVarByKey : function(key, clientVarsManager) {
+            return new Promise(function(resolve, reject) {
+                var keyExists = clientVarsManager.exists(key);
+                if (!keyExists) {
+                    reject(key);
+                } else {
+                    resolve(key);
+                }
+            });
+        },
+        _fetchClientVarByDefinition : function(clientVarDef, clientVarsManager, msgLoading) {
+            var self = this;
+            return new Promise(function(resolve, reject) {
+                if (clientVarDef.path) {
+                    clientVarDef.promise = DependencyLoader.getInst().getDependencies({
+                        defaultVars : clientVarDef.path
+                    })
+                    .then(self._onClientVarDependenciesLoaded.bind(self, clientVarDef, clientVarsManager, msgLoading))
+                    .then(function() {
+                        resolve(clientVarDef);
+                    })
+                    ['catch'](function() {
+                        reject(clientVarDef);
+                    });
+                } else {
+                    reject(clientVarDef);
+                }
+            });
         },
         /**
          * Use the dependency manager to fetch the templates and transform them
