@@ -55,7 +55,7 @@ define( [
 
             this._super.apply(this, arguments);
 
-            this.childrenDef = {template: this.opts.template};
+            this.setChildrenDefinition({ template : this.opts.template });
 
             // Holds a reference to the children component instances
             this.listDict = {};

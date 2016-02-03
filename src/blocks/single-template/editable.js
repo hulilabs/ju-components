@@ -46,7 +46,7 @@ define( [
 
             this._super.apply(this, args);
 
-            this.childrenDef = childrenDef;
+            this.setChildrenDefinition(childrenDef);
 
             this.addResources(resourcesDef);
             this.addResources(RESOURCE_MAP);

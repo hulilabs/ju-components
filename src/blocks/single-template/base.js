@@ -31,7 +31,7 @@ define( [
         init : function(args, templatePath, resourcesDef, childrenDef) {
             this._super.apply(this, args);
 
-            this.childrenDef = childrenDef;
+            this.setChildrenDefinition(childrenDef);
 
             this.addResources(resourcesDef);
 
