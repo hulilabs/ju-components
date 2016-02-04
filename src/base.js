@@ -1222,11 +1222,13 @@ define( [
             // Then remove from dom only if
             if (localRemoveView && isRootDelete) {
                 // Removes all the handlers and the view itself from the DOM
-                if (this.$insertionPoint) {
+                if (this.$view) {
                     // We need to check if the $view is already set in case that
                     // the destroy method has been called before the setup one
                     // (i.e.) the user is changing tabs too quickly
-                    this.$insertionPoint.remove();
+
+                    // @warn: if merged with insertion point on appendToView, the whole insertion point is removed
+                    this.$view.remove();
                 }
             }
         },
