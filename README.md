@@ -1,3 +1,4 @@
+[![Build Status](https://travis-ci.org/hulilabs/ju-components.svg?branch=master)](https://travis-ci.org/hulilabs/ju-components)
 
 # Ju-Components
 This library can be used as a standalone library or as a separate dependencies library, in which case we will need to add the following entry to the require config file:

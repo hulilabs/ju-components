@@ -39,7 +39,7 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-newer');
 
     grunt.registerTask('test', [
-            'newer:jscs',
+            'jscs',
             'newer:jshint'
             // uncomment for running unit tests when available
             // 'mochaTest'
