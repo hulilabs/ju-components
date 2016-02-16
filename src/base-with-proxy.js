@@ -12,12 +12,12 @@
 /**
  * Base component with proxy
  */
-define( [
+define([
             'jquery',
             'ju-components/base',
             'ju-components/base-with-proxy/payload-handler'
         ],
-        function (
+        function(
             $,
             BaseComponent,
             PayloadHandler
@@ -26,26 +26,26 @@ define( [
     'use strict';
 
     var BaseWithProxy = BaseComponent.extend({
-        init : function () {
+        init : function() {
 
             this.setOptions({
                 proxy : null // must be instance, not class
             });
 
-        	this._super.apply(this, arguments);
+            this._super.apply(this, arguments);
 
             this.payloadHandler = PayloadHandler.getInst();
         },
         /**
          * Setups the component and triggers the provided proxy load
          */
-        setup : function () {
-        	// var $insertionPoint = arguments.length > 0 ? arguments[0] : null;
+        setup : function() {
+            // var $insertionPoint = arguments.length > 0 ? arguments[0] : null;
 
-        	this._super.apply(this, arguments);
+            this._super.apply(this, arguments);
 
-        	// Pass the rest of the parameters to fetchDataWithParams
-        	// Transform arguments into an array
+            // Pass the rest of the parameters to fetchDataWithParams
+            // Transform arguments into an array
             var params = Array.prototype.slice.call(arguments, 1);
 
             // @TODO: calling this method in the setup method instead of the load,
@@ -55,7 +55,7 @@ define( [
         /**
          * Retrieves the data from the server
          */
-        fetchDataWithParams : function () {
+        fetchDataWithParams : function() {
             var self = this,
                 waitForPromise;
 
@@ -95,17 +95,17 @@ define( [
          * and returns a Promise that will resolve to the data to be set into the component
          * @return Promise [description]
          */
-        getComponentPayload : function () {
-        	var self = this,
-        		data = arguments;
+        getComponentPayload : function() {
+            var self = this,
+                data = arguments;
 
-        	var dataPromise = new Promise(function (resolve, reject) {
+            var dataPromise = new Promise(function(resolve, reject) {
                 // Children of base component proxy
                 // ju-components/base-with-proxy/proxy
                 if (self.opts.proxy != null && self.opts.proxy.getPayload) {
-                	self.opts.proxy.getPayload(data, resolve, reject);
+                    self.opts.proxy.getPayload(data, resolve, reject);
                 } else {
-                	Logger.error("BaseWithProxy: no proxy setup or getPayload method is not defined");
+                    Logger.error('BaseWithProxy: no proxy setup or getPayload method is not defined');
                 }
             });
             return dataPromise;
@@ -113,17 +113,16 @@ define( [
         /**
          * Process the data given by the getComponent Payload method
          */
-        processPayloadData : function (/* response */) {
+        processPayloadData : function(/* response */) {
             return this.payloadHandler.processPayloadData.apply(this, arguments);
         },
         /**
          * There is an error trying to fecth data for this component
          */
-        errorFetchingData : function () {
-            Logger.error("BaseWithProxy: error fetching data", arguments);
+        errorFetchingData : function() {
+            Logger.error('BaseWithProxy: error fetching data', arguments);
         }
     });
-
 
     BaseWithProxy.classMembers({
 

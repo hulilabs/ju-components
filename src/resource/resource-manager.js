@@ -29,7 +29,7 @@ define([
             'ju-components/resource/storage/context-storage',
             'ju-components/util'
         ],
-        function (
+        function(
             $,
             Class,
             ServerLessResourceFetcher,
@@ -51,7 +51,7 @@ define([
         /**
          * Constructor
          */
-        init : function () {
+        init : function() {
 
             this.storageMapping = {
                 l10n : L10n,
@@ -62,7 +62,7 @@ define([
                 cssFile : (new ClientVarsManager())
             };
         },
-        isLoaded : function (storage, key) {
+        isLoaded : function(storage, key) {
 
             // Validate that the key is not already loading
             // TODO
@@ -75,7 +75,7 @@ define([
          * @param  {[type]} resourceCollector [description]
          * @return {[type]}                   [description]
          */
-        loadResources : function (resourceCollector) {
+        loadResources : function(resourceCollector) {
             var self = this,
                 resourceCollectorMap = resourceCollector.resourceMap;
 
@@ -108,7 +108,7 @@ define([
                 // Creates a new instance of the strategy
                 resourcePromise = resourceFetchStrategy.fetchResources(resourceMap);
 
-                resourcePromise.then(function (data) {
+                resourcePromise.then(function(data) {
 
                     if (!$.isPlainObject(data)) {
                         Logger.error('ResourceManager: response object does not comply with the expected format');
@@ -132,7 +132,7 @@ define([
          * @param  {string} key to retrieve the data
          * @return {object}     [description]
          */
-        getOptionsData : function (key) {
+        getOptionsData : function(key) {
             return OptionsDataStorage.getInst().get(key);
         }
     });
@@ -145,7 +145,7 @@ define([
          * Gets the current resource loader strategy
          * @return {[type]} [description]
          */
-        getStrategy : function () {
+        getStrategy : function() {
             if (!this.strategy) {
                 // Creates a default serverless strategy
                 this.strategy = new ServerLessResourceFetcher();
@@ -155,12 +155,11 @@ define([
         /**
          * Sets the strategy to fetch the resources
          */
-        setStrategy : function (strategy) {
+        setStrategy : function(strategy) {
             this.strategy = strategy;
         }
 
     });
-
 
     // Exports
     return ResourceManager;

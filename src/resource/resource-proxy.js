@@ -16,8 +16,7 @@ define([
         function(
                     $,
                     BaseProxy
-                )
-{
+                ) {
     'use strict';
 
     var ResourcesProxy = BaseProxy.extend({
@@ -37,8 +36,8 @@ define([
                     return new Promise(function(resolve, reject) {
                         var params = {
                             url : self.EP.RESOURCES_API_PREFIX,
-                            data: resources,
-                            type: 'POST',
+                            data : resources,
+                            type : 'POST',
                             success : function() {
                                 var args = arguments;
                                 if (successCallback) {

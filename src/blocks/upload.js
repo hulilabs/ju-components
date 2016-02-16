@@ -16,13 +16,13 @@
  * @note: This class does not handle the instantion of the
  *        plugin, so custom implementations must be done
  */
-define( [
+define([
             'ju-components/blocks/single-template/base',
             'ju-components/resource/storage/context-storage',
             // Unmapped imports
             'dropzone'
         ],
-        function (
+        function(
             SingleTemplateComponent
         ) {
 
@@ -52,7 +52,7 @@ define( [
     };
 
     var UploadAreaComponent = SingleTemplateComponent.extend({
-        init : function (args, templatePath, resourcesDef, childrenDef) {
+        init : function(args, templatePath, resourcesDef, childrenDef) {
 
             // Default optins
             this.setOptions({
@@ -79,13 +79,13 @@ define( [
          * Retrieve dropzone object
          * @warn dropzone might be DOM object if browser does not provide support
          */
-        getDropzone : function () {
+        getDropzone : function() {
             return (this.dropzone instanceof HTMLElement) ? null : this.dropzone;
         },
         /**
          * Standard way to retrieve the dropzone form
          */
-        getDropzoneForm : function () {
+        getDropzoneForm : function() {
             var $form = this.$view.find(this.S.dropzoneForm) || this.t.$dropzoneForm;
 
             if (!$form.length) {
@@ -98,14 +98,14 @@ define( [
          * Dropzone defaults
          * @warn avoid use on pages with multiple dropzone instances
          */
-        setupDropzoneDefaults : function () {
+        setupDropzoneDefaults : function() {
             // nothing
         },
         /**
          * Meant to be overwritten for a custom implementation of the dropzone setup
          * @abstract
          */
-        setupDropzone : function () {
+        setupDropzone : function() {
             // Set id for dropzone autodiscover
             this.getDropzoneForm().attr('id', this.opts.dropzoneID);
 
@@ -125,7 +125,7 @@ define( [
             //     dictMaxFilesExceeded : L10n.t('dropzone_max_files_exceeded')
             // });
         },
-        getData : function () {
+        getData : function() {
             return;
         },
         getDataForParent : function() {

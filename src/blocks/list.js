@@ -13,11 +13,11 @@
  * List of items component
  * @abstract - this component does not define an insertionPoint for each list item
  */
-define( [
+define([
             'require',
             'ju-components/blocks/base-ui'
         ],
-        function (
+        function(
             require,
             BaseUIComponent
         ) {
@@ -55,7 +55,7 @@ define( [
 
             this._super.apply(this, arguments);
 
-            this.childrenDef = {template: this.opts.template};
+            this.childrenDef = {template : this.opts.template};
 
             // Holds a reference to the children component instances
             this.listDict = {};
@@ -83,7 +83,7 @@ define( [
             }
         },
 
-        fetchChildrenComponents : function (parentComponent, loadArgs, childrenExtendedOpts) {
+        fetchChildrenComponents : function(parentComponent, loadArgs, childrenExtendedOpts) {
             this.loadArgs = loadArgs;
             this.childrenExtendedOpts = childrenExtendedOpts || {};
             return this._super.apply(this, arguments);
@@ -91,17 +91,17 @@ define( [
         /**
          * Return currently count of added children
          */
-        getChildrenCount : function () {
+        getChildrenCount : function() {
             return this.listDictCount;
         },
         /**
          * Checks if count of children reached max number allowed
          * if maxChildren is null, then never check this
          */
-        isMaxChildrenReached : function () {
+        isMaxChildrenReached : function() {
             return (this.opts.maxChildren && this.getChildrenCount() >= this.opts.maxChildren);
         },
-        notifyMaxChildrenReached : function () {
+        notifyMaxChildrenReached : function() {
             if (this.isMaxChildrenReached()) {
                 this.fireEventAndNotify(ListComponent.EV.MAX_CHILDREN_REACHED);
             }
@@ -113,7 +113,7 @@ define( [
          * @param  {Object} data to be added
          * @return {Boolean}
          */
-        canAddChild : function (data) {
+        canAddChild : function(data) {
 
             var addChildEvent = {
                 target : this,
@@ -141,18 +141,18 @@ define( [
             this._preventChildAdd = true;
         },
 
-        notifyChildNotAdded : function () {
+        notifyChildNotAdded : function() {
             this.fireEventAndNotify(ListComponent.EV.CHILD_NOT_ADDED, arguments);
         },
         /**
          * Method to add a new child component instance into the list
          */
-        addChild : function (data, enableChildEditMode) {
+        addChild : function(data, enableChildEditMode) {
             if (this.canAddChild(data)) {
                 if (!this.opts.triggerOnSetDataEnd) {
                     return this.addChildAsPromised.apply(this, arguments);
                 } else {
-                    return  {
+                    return {
                         componentId : null,
                         promise : (new Promise($.proxy(this.addChildAsPromised, this, data, enableChildEditMode)))
                     };
@@ -184,7 +184,6 @@ define( [
                 // promise callback, because the value in the instance
                 // can change before the callback gets executed
                 isSettingData = this.isSettingData;
-
 
             log('ListComponent: Assigning new ID to child ', componentId);
 
@@ -229,7 +228,7 @@ define( [
             // Run the setup method of the instance
             var fetchChildrenPromise = compInst.fetchChildrenComponents(compInst, self.loadArgs, self.childrenExtendedOpts.template);
 
-            var chainfetchChildrenPromise = fetchChildrenPromise.then(function () {
+            var chainfetchChildrenPromise = fetchChildrenPromise.then(function() {
 
                     if (componentId == self.defaultItemId && self.defaultItemShouldBeDeleted) {
                         self.hasDefaultItem = false;
@@ -316,7 +315,7 @@ define( [
          * @param  {Object}        addedChild    new component added
          * @param  {Boolean}       isSettingData
          */
-        sortAddedChild : function (addedChild, isSettingData /*, addedChildData*/) {
+        sortAddedChild : function(addedChild, isSettingData /*, addedChildData*/) {
             // this is dummy sample sort function and it's what's expected
             // to arrive in `sortBy` opt
             // this.opts.sortBy = function(childDataToAdd, currentChildData) {
@@ -391,7 +390,6 @@ define( [
                     this.pushChildIntoSortedList(addedChild);
                 }
 
-
             } else {
                 // adds child to empty array
                 this.pushChildIntoSortedList(addedChild, true);
@@ -453,7 +451,7 @@ define( [
         /**
          * Removes the specified child and internal list
          */
-        removeChild : function (compId) {
+        removeChild : function(compId) {
             var compInst = this.getChildInstFromDOM(compId),
                 removedData = compInst.getData();
 
@@ -490,7 +488,6 @@ define( [
             var childIndex = 'number' === typeof childCriteria ?
                              childCriteria :
                              this.getChildIndexInSortedArray(childCriteria);
-
 
             // if the component was found in the array, it is returned
             return childIndex >= 0 ? this.sortedChildList.splice(childIndex, 1) : null;
@@ -540,8 +537,8 @@ define( [
         /**
          * Clear the current items on the list
          */
-        clear : function () {
-            $.each( this.listDict, function( compId, compInst ) {
+        clear : function() {
+            $.each(this.listDict, function(compId, compInst) {
                 compInst.destroy();
             });
 
@@ -555,7 +552,7 @@ define( [
         /**
          * Process empty list
          */
-        emptyList : function () {
+        emptyList : function() {
             var isEmptyList = this.isEmptyList();
             if (isEmptyList) {
                 // We only fire the events when:
@@ -571,14 +568,14 @@ define( [
         /**
          * Check if list is empty
          */
-        isEmptyList : function () {
+        isEmptyList : function() {
             return (this.listDictCount === 0);
         },
         /**
          * Add custom child listeners
          * @param {object} childCompInst child component instance
          */
-        attachChildListeners : function (childCompInst) {
+        attachChildListeners : function(childCompInst) {
             for (var i in this.opts.childListeners) {
                 var listenerDef = this.opts.childListeners[i];
                 childCompInst.on(listenerDef.event, listenerDef.callback);
@@ -587,13 +584,13 @@ define( [
         /**
          * Add child listener on the fly
          */
-        addChildListener : function (event, listener, attach) {
-            var listenerDef = { event: event, callback : listener };
+        addChildListener : function(event, listener, attach) {
+            var listenerDef = { event : event, callback : listener };
             this.opts.childListeners.push(listenerDef);
 
             // attach now or wait for other action
             if (attach) {
-                $.each( this.listDict, function( compId, compInst ) {
+                $.each(this.listDict, function(compId, compInst) {
                     compInst.on(listenerDef.event, listenerDef.callback);
                 });
             }
@@ -603,14 +600,14 @@ define( [
          * a component in the dictionary
          * @return {[type]} [description]
          */
-        formatId : function (id) {
+        formatId : function(id) {
             return 'comp' + id;
         },
         /**
          * Returns the next id to be assigned to a new component
          * @return {string}
          */
-        getNextComponentId : function () {
+        getNextComponentId : function() {
             var nextId = this.nextComponentId;
             this.nextComponentId++;
             return this.formatId(nextId);
@@ -619,13 +616,13 @@ define( [
          * Returns the data of the current component plus the values of the children components
          * @return {object}
          */
-        getData : function () {
+        getData : function() {
 
             // Children data to export
             var childrenData = [],
                 self = this;
 
-            $.each( this.listDict, function( compId, compInst ) {
+            $.each(this.listDict, function(compId, compInst) {
 
                 var compData = compInst.getData();
 
@@ -647,7 +644,7 @@ define( [
         /**
          * Sets the data of the current component plus the values of the children components
          */
-        setData : function (data) {
+        setData : function(data) {
             this.isSettingData = true;
 
             var results = BaseUIComponent.getResultDefaultObject('isEmpty','success'),
@@ -704,7 +701,7 @@ define( [
          * @param  {array}   data data to evaluate
          * @return {Boolean} emptiness state
          */
-        isEmptyData : function (data) {
+        isEmptyData : function(data) {
             return (!$.isArray(data) || data.length === 0);
         },
         /**
@@ -716,7 +713,7 @@ define( [
                 childrenSetDataPromiseArray = [],
                 listItemSetDataResult;
 
-            $.each( data, function( index, value ) {
+            $.each(data, function(index, value) {
                 if (self.canAddChild(value)) {
                     listItemSetDataResult = self.addChild(value);
                     childrenSetDataPromiseArray.push(listItemSetDataResult.promise);
@@ -741,7 +738,7 @@ define( [
 
             // appends every child and stores a promise for each
             // note that this happens only because `triggerOnSetDataEnd` opt is enabled
-            $.each( data, function( index, value ) {
+            $.each(data, function(index, value) {
                 if (self.canAddChild(value)) {
                     listItemSetDataResult = self.addChild(value);
                     childrenSetDataPromiseArray.push(listItemSetDataResult.promise);
@@ -766,14 +763,14 @@ define( [
          * Executes a specific function for each children component of the current component
          * @param  {string} method name of the method to execute
          */
-        eachChildrenComponents : function (method) {
+        eachChildrenComponents : function(method) {
             var returnData = null;
 
             if (this.listDict) {
                 var args = Array.prototype.slice.call(arguments, 1);
                 returnData = [];
                 // Register children maps
-                $.each(this.listDict, function( compId, compInst) {
+                $.each(this.listDict, function(compId, compInst) {
                     // Iterate over all the components asking for the resources
                     if (compInst[method]) {
                         returnData.push(compInst[method].apply(compInst, args));
@@ -786,13 +783,13 @@ define( [
          * callRecursively helper
          * Implements children recursion over list dictionary
          */
-        callChildrenRecursively : function (opts, args) {
+        callChildrenRecursively : function(opts, args) {
             var results = opts.flatten ? [] : {};
 
             if (this.listDict) {
                 var componentsResults = {};
                 // Register children maps
-                $.each(this.listDict, function (compId, compInst) {
+                $.each(this.listDict, function(compId, compInst) {
                     var childrenResult = compInst.callRecursively.apply(compInst, args);
 
                     if (opts.flatten) {
@@ -813,14 +810,13 @@ define( [
         /**
          * Need to destroy all the items in the list
          */
-        destroy : function () {
+        destroy : function() {
             this.isDestroying = true;
             this._super();
             // TODO: destroy all the components in the list as well
             this.clear();
         }
     });
-
 
     ListComponent.classMembers({
         EV : {

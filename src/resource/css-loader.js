@@ -18,7 +18,7 @@ define([
             'ju-shared/md5-encoder',
             'ju-shared/app-config-manager'
         ],
-        function (
+        function(
             $,
             ObservableClass,
             Encoder,
@@ -85,7 +85,7 @@ define([
                     // listens for load, if supported
                     $link.on('load', $.proxy(this.linkLoadCallback, this, $link, callback));
 
-                } else if(callback || timeoutCallback) {
+                } else if (callback || timeoutCallback) {
                     // timeout fallback, in case listening on load doesn't work
                     var timeToWait = timeout || this.DEFAULT_GET_CSS_TIMEOUT,
                         timeoutHandler = timeoutCallback || callback;
@@ -107,7 +107,7 @@ define([
          * Given an array of css paths to load
          * it will use the CSSLoader to append each file individually in the head
          */
-        getIndividualFiles : function (filePathArray) {
+        getIndividualFiles : function(filePathArray) {
             var currentFile,
                 stripPrefix = '',
                 stripSufix = '-' + this.appVersion,
@@ -124,8 +124,8 @@ define([
 
                     var $link = $('<link>');
                     $link.attr({
-                        'rel' : 'stylesheet',
-                        'href':  currentFile
+                        rel : 'stylesheet',
+                        href : currentFile
                     });
                     $cssContainer.append($link);
                 }
@@ -189,7 +189,7 @@ define([
          * Returns whether the file has already been loaded
          * @return {Boolean} true if the file was already loaded
          */
-        isFileLoaded : function (filePath) {
+        isFileLoaded : function(filePath) {
             return this.loadedFiles[filePath];
         },
         /**
@@ -228,7 +228,7 @@ define([
         /**
          * Strips the specified prefix and sufix from the sourceStr
          */
-        sanitizeString : function (sourceStr, prefix, sufix) {
+        sanitizeString : function(sourceStr, prefix, sufix) {
             if (!sourceStr) {
                 return sourceStr;
             }
@@ -243,7 +243,7 @@ define([
          * to the $toElem
          *
          */
-        appendInlineStyles : function (stylesText, $toElem) {
+        appendInlineStyles : function(stylesText, $toElem) {
 
             // inject it at the bottom of the page so it overrides your CSS above it
             $toElem = $toElem || $('body');

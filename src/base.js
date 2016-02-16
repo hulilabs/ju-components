@@ -12,7 +12,7 @@
 /**
  * Base component
  */
-define( [
+define([
             'jquery',
             'ju-shared/observable-class',
             'ju-shared/util',
@@ -23,7 +23,7 @@ define( [
             'ju-components/backbone',
             'ju-components/factory/single-instance'
         ],
-        function (
+        function(
             $,
             ObservableClass,
             Util,
@@ -36,7 +36,6 @@ define( [
         ) {
     'use strict';
 
-
     /**
      * Base Constants
      */
@@ -45,13 +44,12 @@ define( [
         This is the path to the default error handler is no other is specified in opts using the
         key: errorHandler
      */
-     var    DEFAULT_ERROR_HANDLER_PATH = 'ju-components/blocks/error-handler/base',
+     var DEFAULT_ERROR_HANDLER_PATH = 'ju-components/blocks/error-handler/base',
      /*
         This is the path to the default spinner if no other is specified in opts using the
         key: spinner
       */
             DEFAULT_SPINNER_PATH = 'ju-components/blocks/spinner/inpage-spinner/spinner';
-
 
     /**
      * Basic building block for components.
@@ -130,7 +128,7 @@ define( [
      *
      */
     var BaseComponent = ObservableClass.extend({
-        init : function (opts) {
+        init : function(opts) {
 
             // Debug components counter
             window.compCounter = window.compCounter || 0;
@@ -205,7 +203,7 @@ define( [
          * Loads the component own parts and the children parts.
          * Only the root component should call this method
          */
-        load : function () {
+        load : function() {
             // Checks root component
             if (this.isRootComponent) {
 
@@ -239,20 +237,20 @@ define( [
                     // The root component always provides a backbone that will be a
                     // bus to communicate global events in all the components tree
                     // and also provide access to shared instances
-                    .then(function () {
+                    .then(function() {
                         var backbone = new Backbone();
                         self.callRecursively('setBackbone', backbone);
                     })
                     // Wait for all the resources to load
-                    .then(function () {
+                    .then(function() {
                         // Setup this component
                         // The order will be from top to bottom in the component tree
-                        var result =  self.setup.apply(self, args);
+                        var result = self.setup.apply(self, args);
                         // This wil return a promise that will be chained in the lifecyle
                         return result;
-	                })
+                    })
                     // Insert virtual dom into dom (single insertion point)
-                    .then(function (setupResult) {
+                    .then(function(setupResult) {
                         self.appendToDOM();
                         self.fireEventAndNotify(BaseComponent.EV.DOM_READY);
                         return setupResult;
@@ -260,10 +258,10 @@ define( [
 
                 // This catch will capture any error during the loading and setup process
                 self.setupCompletedPromise
-                ['catch'](function () {
+                ['catch'](function() {
                     Logger.error('Failed to load component', arguments);
                     self.toggleErrorVisibility(true, arguments);
-                }).then(function () {
+                }).then(function() {
                     // Hides the spinner
                     self.toggleSpinnerVisibility(false);
                 });
@@ -280,7 +278,7 @@ define( [
          * this approach, we prevent that any jquery selector of this component will bind elements of the
          * children components
          */
-        setup : function () {
+        setup : function() {
             var self = this;
 
             // Stores the insertion point
@@ -315,7 +313,7 @@ define( [
         /**
          * Stores the insertion point locally
          */
-        storeInsertionPoint : function () {
+        storeInsertionPoint : function() {
             var $insertionPoint = arguments.length > 0 ? arguments[0] : null;
 
             // Validate parameters
@@ -339,12 +337,12 @@ define( [
          * which components to load in a dynameic way using the parameter passed along
          * from the load function of the root component
          */
-        initChildrenDef: function() { },
+        initChildrenDef : function() { },
         /**
          * Translate the options object.
          * It will look
          */
-        translateOptions : function () {
+        translateOptions : function() {
             // Skip specifc keys because we don't want to
             // go into other components options
             this.opts = ComponentUtil.processObjL10n(this.opts, ['opts', 'childrenDef', 'template']);
@@ -352,12 +350,12 @@ define( [
         /**
          * Setups the children components
          */
-        childrenSetup : function () {
+        childrenSetup : function() {
             var self = this,
                 args = Array.prototype.slice.call(arguments, 1);
 
             // Register children maps
-            $.each(self.components, function (key, childComp) {
+            $.each(self.components, function(key, childComp) {
                 // Iterate over all the components asking for the resources
                 var compInst = childComp.inst,
                     $childInsertionPoint = self.$view.find(childComp.insertionPoint);
@@ -367,15 +365,15 @@ define( [
         /**
          * This method should be overwritten by the client in order to build the template for this component
          */
-        configureComponent : function () { },
+        configureComponent : function() { },
         /**
          * Find local elements. Holds reference to the local DOMS elements
          * Including those that will work as the insertion  point for the children components
          */
-        _findLocalElems : function () {
+        _findLocalElems : function() {
             var self = this;
             if (this.S) {
-                $.each(this.S, function (key, selector) {
+                $.each(this.S, function(key, selector) {
                     var $elem = self.$view.find(selector);
                     if (!$elem.length) {
                         Logger.error('BaseComponent: could not find a DOM element with selector: ', selector);
@@ -388,7 +386,7 @@ define( [
          * Use a resource manager to fetch all the resources for all the children components
          * @return {[type]} [description]
          */
-        fetchResources : function () {
+        fetchResources : function() {
 
             var self = this;
 
@@ -413,7 +411,7 @@ define( [
          * Callback when all the children have been setup and are ready
          * to be used
          */
-        setupCompleted : function () { },
+        setupCompleted : function() { },
         /**
          * Include options in the opts collector
          * Set default options and override parents options
@@ -423,13 +421,13 @@ define( [
          * @warn ALWAYS call setOptions BEFORE _super
          * @param {object} class level options to queue
          */
-        setOptions : function () {
+        setOptions : function() {
             this.optsCollector = this.optsCollector || [];
             // Optimized array prepend
             var i, argLen, len = this.optsCollector.length + arguments.length,
                 optsArr = new Array(len);
 
-            for (i = 0, argLen = arguments.length;  i < argLen; i++) {
+            for (i = 0, argLen = arguments.length; i < argLen; i++) {
                 optsArr[i] = arguments[i];
             }
 
@@ -439,7 +437,7 @@ define( [
             }
             this.optsCollector = optsArr;
         },
-        prepareOptions : function (forcedOpts) {
+        prepareOptions : function(forcedOpts) {
             // Merge options collector
             this.opts = $.extend.apply($, [true, {}].concat(this.optsCollector).concat([forcedOpts]));
         },
@@ -448,7 +446,7 @@ define( [
          * @param {object}  selectorsObj selectors dictionary
          * @param {boolean} overwrite    overwrite stored selectors dictionary (forced)
          */
-        setSelectors : function (selectorsObj, overwrite) {
+        setSelectors : function(selectorsObj, overwrite) {
             this.S = this.S || {};
             overwrite = !!overwrite || false;
 
@@ -470,7 +468,7 @@ define( [
          *     context : {}
          * };
          */
-        addResources : function (resourceMap) {
+        addResources : function(resourceMap) {
             // $.extend does not support nested arrays merge
             // this.resourcesDef = $.extend(true, {}, this.resourcesDef, resourceMap);
             // log('AddResources : extend', this, this.resourcesDef, resourceMap);
@@ -502,12 +500,12 @@ define( [
          * We register the children maps because it's likely that the parent component will have styles that overwrites
          * children default styles
          */
-        addResourceMapToCollector : function (resourceCollector) {
+        addResourceMapToCollector : function(resourceCollector) {
 
             var self = this;
 
             // Register children maps
-            $.each(self.components, function (key, component) {
+            $.each(self.components, function(key, component) {
                 log('Adding resources of component...', key, component);
                 var compInst = component.inst;
                 // Iterate over all the components asking for the resources
@@ -526,10 +524,10 @@ define( [
          * and then resolve the promise when all of the children are ready (that means will all of its children loaded as well)
          *
          */
-        fetchChildrenComponents : function (parentComponent, loadArgs, childrenExtendedOpts) {
+        fetchChildrenComponents : function(parentComponent, loadArgs, childrenExtendedOpts) {
             var self = this;
 
-            var childrenLoadedPromise = new Promise(function (resolve, reject) {
+            var childrenLoadedPromise = new Promise(function(resolve, reject) {
 
                 var promise = self.initChildrenDef.apply(self, loadArgs);
 
@@ -537,19 +535,19 @@ define( [
                     promise = Promise.resolve();
                 }
 
-                promise.then(function(){
+                promise.then(function() {
                     if (!self.childrenDef) {
                         log('fetchChildrenComponents: No children defined...');
                         // Resolve inmediatelly as we dont have any children to load
 
                         resolve();
                     } else {
-                        log('fetchChildrenComponents: Loading children def...', self.childrenDef );
+                        log('fetchChildrenComponents: Loading children def...', self.childrenDef);
                         // Loading
                         FactoryBase
                             .getInst()
                             .createInstances(self.childrenDef, parentComponent, loadArgs, childrenExtendedOpts)
-                            .then(function (components) {
+                            .then(function(components) {
                                 self.components = components;
                                 resolve();
                             })
@@ -568,20 +566,20 @@ define( [
         /**
          * Bind the events of the local component
          */
-        bindEvents : function () {
+        bindEvents : function() {
 
         },
 
         /**
          * Clear the current component
          */
-        clear : function () {
+        clear : function() {
         },
 
         /**
          * Appends the current element to this component view
          */
-        appendToView : function (content, mergeWithView) {
+        appendToView : function(content, mergeWithView) {
             if (!content) {
                 Logger.error('BaseComponent: cannot append empty content');
                 return;
@@ -619,7 +617,7 @@ define( [
         /**
          * Appends this component to the dom
          */
-        appendToDOM : function () {
+        appendToDOM : function() {
             if (this.isRootComponent) {
                 if (this.rootMergeWithView) {
                     // Merge insertion point and virtual dom root
@@ -636,7 +634,7 @@ define( [
          * Returns the data of the current component plus the values of the children components
          * @return {object}
          */
-        getData : function (childrenFilterList) {
+        getData : function(childrenFilterList) {
             return this._getAllData(childrenFilterList);
         },
 
@@ -651,10 +649,10 @@ define( [
             // Children data to export
             if (this.components) {
                 var childrenData = {};
-                $.each( this.components, function( key, component ) {
+                $.each(this.components, function(key, component) {
                     var compInst = component.inst,
                         data;
-                    if (!childrenFilterList || (childrenFilterList.indexOf(compInst) > -1) ){
+                    if (!childrenFilterList || (childrenFilterList.indexOf(compInst) > -1)) {
                         data = self._getComponentData(key, compInst);
                         $.extend(childrenData, data);
                     }
@@ -717,25 +715,25 @@ define( [
          *  Must be implemented in child classes
          *
          */
-        getLocalData : function () { },
+        getLocalData : function() { },
         /**
          * Gets the errors after a getValue operation that represents
          * any validation error or I/O operation error
          * @return {object}
          */
-        getErrors : function () {
+        getErrors : function() {
 
         },
         /**
          * Sets the data of the current component plus the values of the children components
          *
          */
-        setData : function (data /* , extraDataFromParent */) {
+        setData : function(data /* , extraDataFromParent */) {
             var self = this,
                 setSuccessfull = false;
             if ($.isPlainObject(data)) {
                 if (this.components) {
-                    $.each( self.components, function( key, compDef ) {
+                    $.each(self.components, function(key, compDef) {
                         // Key is the children key and value is the component object
                         var value = data[key];
                         if (compDef) {
@@ -768,8 +766,8 @@ define( [
          * @return {object} standard result object
          *                  - inst {Object} reference to current component
          */
-        composeResultObject : function (args, defaultResultObject) {
-            return $.extend.apply($, [true, {}, defaultResultObject].concat([].slice.call(args)).concat({ inst: this }));
+        composeResultObject : function(args, defaultResultObject) {
+            return $.extend.apply($, [true, {}, defaultResultObject].concat([].slice.call(args)).concat({ inst : this }));
         },
         /**
          * Standard object returned by a setData method
@@ -777,7 +775,7 @@ define( [
          * - inst    {Object}  reference to current component
          * - success {boolean} set data failed or succeded
          */
-        setDataResult : function () {
+        setDataResult : function() {
             return this.composeResultObject(arguments, { success : false });
         },
         /**
@@ -801,14 +799,14 @@ define( [
          * Executes a specific function for each children component of the current component
          * @param  {string} method name of the method to execute
          */
-        eachChildrenComponents : function (method) {
+        eachChildrenComponents : function(method) {
             var self = this,
                 returnData = {};
 
             if (self.components) {
                 var args = Array.prototype.slice.call(arguments, 1);
                 // Register children maps
-                $.each(self.components, function (key, childComp) {
+                $.each(self.components, function(key, childComp) {
                     // Iterate over all the components asking for the resources
                     var compInst = childComp.inst;
                     if (compInst[method]) {
@@ -840,7 +838,7 @@ define( [
          * callLocaly : determine if method should be run locally
          * callOnChildren : determine if method should be run on childrens
          */
-        callRecursively : function (optsParam, methodParam /* , args */ ) {
+        callRecursively : function(optsParam, methodParam /* , args */) {
             var self = this,
                 args = Array.prototype.slice.call(arguments, 0),
                 method = methodParam,
@@ -897,13 +895,13 @@ define( [
          * Implements children recursion over components
          * @abstract
          */
-        callChildrenRecursively : function (opts, args) {
+        callChildrenRecursively : function(opts, args) {
             var results = opts.flatten ? [] : {};
 
             if (this.components) {
                 var components = {};
                 // Register children maps
-                $.each(this.components, function (key, childComp) {
+                $.each(this.components, function(key, childComp) {
                     // Iterate over all the components asking for the resources
                     var compInst = childComp.inst,
                         childrenResult = compInst.callRecursively.apply(compInst, args);
@@ -926,19 +924,19 @@ define( [
         /**
          * Sets the parent component if any of this component
          */
-        setParentComponent : function (parentComponent) {
+        setParentComponent : function(parentComponent) {
             this.parentComponent = parentComponent;
         },
         /**
          * Gets the parent component of the current one
          */
-        getParentComponent : function () {
+        getParentComponent : function() {
             return this.parentComponent;
         },
         /**
          * Gets the children components container
          */
-        getComponents : function () {
+        getComponents : function() {
             return this.components;
         },
         /**
@@ -947,7 +945,7 @@ define( [
          * @param  {array}  componentsContext components pool (default: this.component)
          * @return {[type]}                   child key in components context
          */
-        getChildKey : function (childCompInst, componentsContext) {
+        getChildKey : function(childCompInst, componentsContext) {
             var childKey = null;
             componentsContext = componentsContext ? componentsContext : this.components;
 
@@ -964,7 +962,7 @@ define( [
          * Check if key is defined as a child component
          * @param  {Object} childKey key for retrieval
          */
-        childExists : function (childKey, componentsContext) {
+        childExists : function(childKey, componentsContext) {
             componentsContext = componentsContext ? componentsContext : this.components;
             return !!componentsContext[childKey] && componentsContext.hasOwnProperty(childKey);
         },
@@ -972,7 +970,7 @@ define( [
          * Get child component by key
          * @param  {Object} childKey key for retrieval
          */
-        c : function (childKey, componentsContext) {
+        c : function(childKey, componentsContext) {
             componentsContext = componentsContext ? componentsContext : this.components;
             return this.childExists(childKey, componentsContext) ? componentsContext[childKey].inst : null;
         },
@@ -980,7 +978,7 @@ define( [
          * Utility function used to determine if the current component
          * if a descendant of the specified root component
          */
-        isDescendantOf : function (rootComponent) {
+        isDescendantOf : function(rootComponent) {
             var directChlld = BaseComponent.searchComponentInDescendants(rootComponent, this);
             return (directChlld != null);
         },
@@ -988,7 +986,7 @@ define( [
          * Merges the attributes of the $view top node with the content top node
          * And then merges the children as well
          */
-        _mergeViewWithContent : function ($domSpace, content) {
+        _mergeViewWithContent : function($domSpace, content) {
             var $content = $(content),
                 currentViewClass = $domSpace.attr('class') || '',
                 contentClass = $content.attr('class') || '';
@@ -1019,7 +1017,7 @@ define( [
         appendL10n : function(key) {
             if (key && key != null) {
                 // Make sure the l10n key exists with an array
-                this.resourcesDef = $.extend(true, {}, this.resourcesDef, {l10n:[]});
+                this.resourcesDef = $.extend(true, {}, this.resourcesDef, {l10n : []});
 
                 // push the new key to be retrieved
                 this.resourcesDef.l10n.push(key);
@@ -1030,7 +1028,7 @@ define( [
          * Sets the notification center instance that will
          * use to handle the event in the components tree
          */
-        setBackbone : function (backbone) {
+        setBackbone : function(backbone) {
             this.backbone = backbone;
         },
         /**
@@ -1049,7 +1047,7 @@ define( [
             this.callCustomSetMethod(option, value);
         },
 
-        callCustomSetMethod : function (option, value) {
+        callCustomSetMethod : function(option, value) {
             var methodName = '_set' + Util.capitalizeFirstLetter(option),
                 method = this[methodName];
             if (method) {
@@ -1062,7 +1060,7 @@ define( [
          * notification center.
          * @param  {string} name event name
          */
-        fireEventAndNotify: function(name) {
+        fireEventAndNotify : function(name) {
             var args = Array.prototype.slice.call(arguments, 1);
             // We re-insert the event name + the current instance to the arguments
             args.unshift(name, this);
@@ -1081,7 +1079,7 @@ define( [
          * @param  {[type]}  force     if set to true and the isVisible param is false, then it will hide the spinner
          *                             regardless of the visiblityCount
          */
-        toggleSpinnerVisibility : function (isVisible, force) {
+        toggleSpinnerVisibility : function(isVisible, force) {
             var self = this,
                 spinner = this.opts.spinner;
 
@@ -1112,7 +1110,7 @@ define( [
                                         .getInst()
                                         .getComponent(spinner, DEFAULT_SPINNER_PATH);
 
-                spinnerPromise.then(function (spinnerInstance) {
+                spinnerPromise.then(function(spinnerInstance) {
                     // If we find that the spinner has been hidden
                     // before it was ready to show, then we abord the instance creation and loading
                     if (self.abortSpinnerLoading) {
@@ -1163,7 +1161,7 @@ define( [
          * @param  {Object}  errorInfo contextual information about the error. This can be used to display more information
          *                             by the error handler
          */
-        toggleErrorVisibility : function (isVisible, errorInfo) {
+        toggleErrorVisibility : function(isVisible, errorInfo) {
 
             var self = this,
                 errorHandler = this.opts.errorHandler || BaseComponent.getDefaultErrorHandler();
@@ -1175,7 +1173,7 @@ define( [
                                         .getInst()
                                         .getComponent(errorHandler);
 
-                component.then(function (errorHandlerInstance) {
+                component.then(function(errorHandlerInstance) {
 
                     // Removes the errorHandler from the view
                     if (self.errorComp) {
@@ -1203,7 +1201,7 @@ define( [
          * Destroys this component information, including children
          * DOM elements and bindings
          */
-        destroy : function (removeViewFromDOM, isRootDelete) {
+        destroy : function(removeViewFromDOM, isRootDelete) {
 
             var localRemoveView, childrenRemoveView;
             isRootDelete = (typeof isRootDelete === 'boolean') ? isRootDelete : true;
@@ -1260,7 +1258,7 @@ define( [
          * @param  {Object}  childKey  key of the child to remove
          * @return {Boolean} destroy success
          */
-        removeChild : function (childKey /* , dettachBeforeDestroy */) {
+        removeChild : function(childKey /* , dettachBeforeDestroy */) {
             // dettach to avoid backbone triggers on destroy
             var dettachedChild = this.detachChild(childKey),
                 componentsContext = dettachedChild ? this.detachedComponents : this.components;
@@ -1308,9 +1306,8 @@ define( [
         }
     });
 
-
     BaseComponent.classMembers({
-        EV: {
+        EV : {
             READY : 'ready',
             DOM_READY : 'dom_ready'
         },
@@ -1327,7 +1324,7 @@ define( [
          * is children of root component.
          *
          */
-        searchComponentInDescendants : function (rootComponent, targetComponent) {
+        searchComponentInDescendants : function(rootComponent, targetComponent) {
             var currentComp = targetComponent,
                 childComp;
 
@@ -1346,13 +1343,13 @@ define( [
          * be used if an error occurs
          * This will be path to a component that will handle
          */
-        setDefaultErrorHandler : function (defaultErrorHandler) {
+        setDefaultErrorHandler : function(defaultErrorHandler) {
             this.defaultErrorHandler = defaultErrorHandler;
         },
         /**
          * Gets the default error handler defined all the components
          */
-        getDefaultErrorHandler : function () {
+        getDefaultErrorHandler : function() {
             return this.defaultErrorHandler;
         }
     });

@@ -13,7 +13,7 @@
 /**
  * Base component
  */
-define( [
+define([
             'ju-components/blocks/base-ui',
             'ju-components/util',
             'ju-shared/util',
@@ -23,7 +23,7 @@ define( [
              */
             'x-editable'
         ],
-        function (
+        function(
             BaseUIComponent,
             ComponentUtils,
             Util,
@@ -70,7 +70,7 @@ define( [
         /**
          * Editable component basic events
          */
-        bindEvents : function () {
+        bindEvents : function() {
 
             // false value in editModeTrrigger will disable the trigger by user events
             if (false !== this.opts.editModeTrigger) {
@@ -91,7 +91,7 @@ define( [
                 MarkChildrenAlwaysEditableFn.call(this);
             }
         },
-        setupCompleted : function () {
+        setupCompleted : function() {
 
             log('Saving Editable component....', this, this.$view);
             // Stores itself in the view data storage
@@ -118,14 +118,14 @@ define( [
         /**
          * Process data set to editable
          */
-        setData : function () {
+        setData : function() {
             var self = this,
                 result = this._super.apply(this, arguments),
                 isEmpty = result.isEmpty,
                 resultPromise = result.promise;
 
             if (resultPromise) {
-                result.promise = resultPromise.then(function(isLocalEmpty){
+                result.promise = resultPromise.then(function(isLocalEmpty) {
                     self.displayOnEmpty(isLocalEmpty);
                     return isLocalEmpty;
                 });
@@ -140,7 +140,7 @@ define( [
         /**
          * Open edit mode
          */
-        editChild : function (e) {
+        editChild : function(e) {
             if (!this.opts.enableEditMode) {
                 e.preventDefault();
                 e.stopPropagation();
@@ -150,7 +150,7 @@ define( [
         /**
          * Save edit mode
          */
-        saveClick : function (e) {
+        saveClick : function(e) {
             if (this.opts.enableEditMode) {
                 e.preventDefault();
                 e.stopPropagation();
@@ -165,18 +165,18 @@ define( [
          *
          * @param {Boolean} enableEdit true to set the component as editable
          */
-        enableEditMode : function (enableEdit, force, eventInfo) {
+        enableEditMode : function(enableEdit, force, eventInfo) {
 
             if (!force && this.opts.enableEditMode == enableEdit) {
 
                 if (this.opts.enableEditMode) {
-                    log("EditableComponent: already in edit mode");
+                    log('EditableComponent: already in edit mode');
                 } else {
-                    log("EditableComponent: already in view mode");
+                    log('EditableComponent: already in view mode');
                 }
                 return;
             } else if (this.opts.readOnly) {
-                log("EditableComponent: read-only mode");
+                log('EditableComponent: read-only mode');
                 return;
             }
 
@@ -206,7 +206,7 @@ define( [
          *  - Click     -> Touchstart
          *  - Db click  -> Touchstart
          */
-        setEditModeTrigger : function (trigger) {
+        setEditModeTrigger : function(trigger) {
             var self = this,
                 trigger = trigger || 'manual';
 
@@ -235,7 +235,7 @@ define( [
             };
 
             // Callback to be triggered only once on touch event or click
-            var _onTrigger = function (e) {
+            var _onTrigger = function(e) {
                 var isTouchEndCancelable = (e.type === 'touchend' && e.cancelable),
                     isTrigger = (e.type === trigger);
                 // List support for remove row action
@@ -300,7 +300,7 @@ define( [
          * @param  {event} triggerEvent  trigger event comming from the browser, this parameter
          *                               is optional
          */
-        activateEditMode : function (eventInfo) {
+        activateEditMode : function(eventInfo) {
             this.$view.addClass(EDITABLE_ROOT);
 
             EditableComponent.closeOthers(this.$view[0]);
@@ -315,7 +315,7 @@ define( [
         /**
          * Deactivates the edit mode from this component and all its children
          */
-        activateViewMode : function (eventInfo) {
+        activateViewMode : function(eventInfo) {
             // We cannot simply render the view mode .
             // We need to validate first if the data entered is valid
             var errors = this.validate();
@@ -343,7 +343,7 @@ define( [
          * - Control editable view mode based on empty state
          * @param {boolean} isEmpty : final emptiness state
          */
-        onCascadeCheckEmptiness : function (isEmpty) {
+        onCascadeCheckEmptiness : function(isEmpty) {
             var isEmpty = this._super.apply(this, arguments);
 
             // Deactivates the edit mode
@@ -361,7 +361,7 @@ define( [
          * view mode, the validation and submittion of the data is handled by other classes
          * @param boolean isEmpty emptiness state
          */
-        displayViewMode : function (isEmpty) {
+        displayViewMode : function(isEmpty) {
             if (typeof isEmpty !== 'boolean') {
                 Logger.error('displayViewMode : isEmpty state boolean required', isEmpty);
             }
@@ -375,7 +375,7 @@ define( [
          * Detect editable emptiness
          * On true: add empty styles and trigger event
          */
-        displayOnEmpty : function (isEmpty) {
+        displayOnEmpty : function(isEmpty) {
             if (typeof isEmpty === 'undefined') {
                 Logger.warn('displayOnEmpty : isEmpty state boolean required');
             }
@@ -396,7 +396,7 @@ define( [
          * The only responsability of this class is to generate and show the
          * edit mode, the validation and submittion of the data is handled by other classes
          */
-        displayEditMode : function () {
+        displayEditMode : function() {
             if (!this.opts.enableEditMode) {
                 log('EditableComponent: Switching to displayEditMode');
                 this.$view.addClass(EDITING_CLASS_PREFIX);
@@ -406,7 +406,7 @@ define( [
         /**
          * Method to set the focus in the current component
          */
-        focus : function () {
+        focus : function() {
             var firstElem = Util.getFirstElemFromObject(this.getComponents());
             if (firstElem) {
                 var compDef = firstElem.value,
@@ -425,18 +425,17 @@ define( [
          * @return mixed null if there is no error, otherwise, an array
          * of the error that were found
          */
-        validate : function (recursive, displayEditModeOnErrors) {
+        validate : function(recursive, displayEditModeOnErrors) {
             var errors = null;
 
-
             // If the flag is undefined then defaults to true
-            displayEditModeOnErrors = displayEditModeOnErrors === undefined  ?
+            displayEditModeOnErrors = displayEditModeOnErrors === undefined ?
                                         true :
                                         displayEditModeOnErrors;
 
             if (recursive !== false) {
                 var childrenErrors = this.callRecursively({ flatten : true }, 'validate', false, false);
-                errors = $.grep(childrenErrors,function(n){ return n; });
+                errors = $.grep(childrenErrors,function(n) { return n; });
 
                 // Activates the edit mode IF
                 if (errors &&
@@ -456,7 +455,7 @@ define( [
          * This method is called whenever a children trigger an intent to submit. This applies
          * when the component is operating in edit mode
          */
-        descendantSubmitted : function (component) {
+        descendantSubmitted : function(component) {
             if (component.isDescendantOf(this)) {
                 this.activateViewMode();
             }
@@ -464,7 +463,7 @@ define( [
         /**
          * Listen the children events such as submittion
          */
-        listenDescendantsEvents : function () {
+        listenDescendantsEvents : function() {
             this.removeDescendantListeners();
 
             this.listenDescendantEventsCallback = $.proxy(this.descendantSubmitted, this);
@@ -473,13 +472,12 @@ define( [
         /**
          * Removes the listeners added in listenForChildrenEvents
          */
-        removeDescendantListeners : function () {
+        removeDescendantListeners : function() {
             if (this.listenDescendantEventsCallback) {
                 this.backbone.off(EditableComponent.EV.INTENT_TO_SUBMIT, this.listenDescendantEventsCallback);
             }
         }
     });
-
 
     EditableComponent.classMembers({
         EV : {
@@ -487,18 +485,18 @@ define( [
             CHANGED : 'changed',
             DATA_EMPTY : 'dataEmpty',
             INTENT_TO_SUBMIT : 'intentToSubmit',
-            EDIT_MODE_ACTIVATED : "editModeActivated",
-            DISPLAY_MODE_ACTIVATED : "displayModeActivated",
+            EDIT_MODE_ACTIVATED : 'editModeActivated',
+            DISPLAY_MODE_ACTIVATED : 'displayModeActivated',
             COMMIT : 'editableCommit'
         },
         /*
           Closes other containers except one related to passed element.
           Other containers can be cancelled or submitted (depends on onblur option)
         */
-        closeOthers: function(element) {
+        closeOthers : function(element) {
             $('.' + EDITABLE_ROOT).each(function(i, el) {
                 // do nothing with passed element and it's children
-                if(el === element || $(el).find(element).length) {
+                if (el === element || $(el).find(element).length) {
                     return;
                 }
 
@@ -506,7 +504,7 @@ define( [
                 var $el = $(el),
                     editable = $el.data(ELEM_DATA_KEY);
 
-                if(!editable) {
+                if (!editable) {
                     return;
                 }
 
@@ -525,7 +523,7 @@ define( [
          * Attach events handlers that will close editable components on click / escape
          * todo: remove classes from js library class
          */
-         _onDocumentClick : function (e) {
+         _onDocumentClick : function(e) {
             var $target = $(e.target), i,
                 exclude_classes = ['.editable-container',
                                    '.ui-datepicker-header',
@@ -545,13 +543,13 @@ define( [
             //for some reason FF 20 generates extra event (click) in select2 widget with e.target = document
             //we need to filter it via construction below. See https://github.com/vitalets/x-editable/issues/199
             //Possibly related to http://stackoverflow.com/questions/10119793/why-does-firefox-react-differently-from-webkit-and-ie-to-click-event-on-selec
-            if($target.is(document)) {
+            if ($target.is(document)) {
                 return;
             }
 
             //if click inside one of exclude classes --> no nothing
-            for(i=0; i<exclude_classes.length; i++) {
-                if($target.is(exclude_classes[i]) || $target.parents(exclude_classes[i]).length) {
+            for (i = 0; i < exclude_classes.length; i++) {
+                if ($target.is(exclude_classes[i]) || $target.parents(exclude_classes[i]).length) {
                     return;
                 }
             }
@@ -559,12 +557,12 @@ define( [
             //close all open containers (except one - target)
             this.closeOthers(e.target);
         },
-        closeOnDocumentClick : function () {
+        closeOnDocumentClick : function() {
 
             var self = this;
 
             //attach document handler to close containers on click / escape
-            if(!self.documentEventsAttached) {
+            if (!self.documentEventsAttached) {
                 //////////////////////////
                 // BEGIN HULI CODE
                 //////////////////////////

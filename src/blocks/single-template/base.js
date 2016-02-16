@@ -13,11 +13,11 @@
 /**
  * Single Template
  */
-define( [
+define([
             'ju-components/blocks/base-ui',
             'ju-components/resource/storage/template-storage'
         ],
-        function (
+        function(
             BaseUIComponent,
             TemplateStorage
         ) {
@@ -25,9 +25,9 @@ define( [
     'use strict';
 
     var SingleTemplateComponent = BaseUIComponent.extend({
-    	/**
-    	 * @param args (array) bypass extended constructor arguments
-    	 */
+        /**
+         * @param args (array) bypass extended constructor arguments
+         */
         init : function(args, templatePath, resourcesDef, childrenDef) {
             this._super.apply(this, args);
 
@@ -46,7 +46,7 @@ define( [
                 this.templatePath = templatePath;
             }
         },
-        configureComponent : function () {
+        configureComponent : function() {
             // Single Template
             if (this.templatePath) {
                 var template = TemplateStorage.getInst().get(this.templatePath);

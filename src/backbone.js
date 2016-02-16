@@ -9,15 +9,14 @@
  * (c) Huli Inc
  */
 
-
 /**
  * Observable Class
  */
-define( [
+define([
             'jquery',
             'ju-shared/observable-class'
         ],
-        function (
+        function(
             $,
             ObservableClass
         ) {
@@ -35,25 +34,25 @@ define( [
      *
      */
     var Backbone = ObservableClass.extend({
-        init : function () {
+        init : function() {
             /*
                 Stores the shared components
              */
             this.sharedInstances = {};
         },
-        getSharedInstance : function (key) {
+        getSharedInstance : function(key) {
             return this.sharedInstances[key];
         },
         /**
          * We will store a instance with a key in the shared instances
          */
-        addSharedInstance : function (key, value) {
+        addSharedInstance : function(key, value) {
             this.sharedInstances[key] = value;
         },
         /**
          * Removes a shared instance from the local variable
          */
-        removeSharedInstance : function (key) {
+        removeSharedInstance : function(key) {
             var removedInst = this.sharedInstances[key];
             delete this.sharedComponents[key];
             return removedInst;

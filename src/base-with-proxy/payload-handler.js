@@ -13,11 +13,11 @@
  * Payload Handler
  * @abstract
  */
-define( [
+define([
             'jquery',
             'ju-shared/observable-class'
         ],
-        function (
+        function(
             $,
             ObservableClass
         ) {
@@ -29,9 +29,9 @@ define( [
          * Process the data given by the get component payload method
          * @abstract
          */
-        processPayloadData : function () {
-        	var response = arguments.length > 0 ? arguments[0] : null,
-        		args = Array.prototype.slice.call(arguments, 1);
+        processPayloadData : function() {
+            var response = arguments.length > 0 ? arguments[0] : null,
+                args = Array.prototype.slice.call(arguments, 1);
 
             // If the response is explicitly null or undefined
             // then we return since there is nothing to process

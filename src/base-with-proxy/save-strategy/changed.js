@@ -12,18 +12,17 @@
 /**
  * Save strategy : Changed
  */
-define( [
+define([
             'jquery',
             'ju-components/base-with-proxy/payload-handler',
             'ju-components/helper/changes-tracker'
         ],
-        function (
+        function(
             $,
             PayloadHandler,
             ChangesTracker
         ) {
     'use strict';
-
 
     /**************************************************
      *
@@ -31,7 +30,7 @@ define( [
      *
      **************************************************/
     var SaveChangedStrategy = PayloadHandler.extend({
-        setup : function () {
+        setup : function() {
             /*
                 At this point we know that the notification center has already been set
              */
@@ -45,13 +44,12 @@ define( [
          *
          * @return Promise Save promise
          */
-        saveData : function (onSuccess) {
+        saveData : function(onSuccess) {
             // Allow force all data in this model
             var data,
                 savePromise,
                 changedChildren = null,
                 self = this;
-
 
             var errors = this.validateAll();
 
@@ -66,7 +64,7 @@ define( [
 
                 savePromise = this.submitDataToServer(data, onSuccess);
 
-                savePromise.then(function (response) {
+                savePromise.then(function(response) {
                     // Commits the set of changes
                     changesBag.commit();
 
@@ -83,7 +81,7 @@ define( [
          * Mark components with data as changed in the changes tracker
          *
          */
-        markComponentsWithData : function (data) {
+        markComponentsWithData : function(data) {
             var changesTracker = ChangesTracker.getInst(this.backbone);
 
             if (!data || !changesTracker || !this.getComponents()) {

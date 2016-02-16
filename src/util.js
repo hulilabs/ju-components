@@ -12,11 +12,11 @@
 /**
  * Base component
  */
-define( [
+define([
             'ju-shared/class',
             'ju-shared/l10n'
         ],
-        function (
+        function(
             Class,
             L10n
         ) {
@@ -27,7 +27,6 @@ define( [
      */
     var ComponentUtil = Class.extend({
     });
-
 
     ComponentUtil.classMembers({
         /**
@@ -49,11 +48,11 @@ define( [
          *     key2 : '!@label_save'
          * }
          */
-        processObjL10n : function (obj, skipKeys, prefixKey) {
+        processObjL10n : function(obj, skipKeys, prefixKey) {
             var newObj = obj;
             if (obj) {
                 prefixKey = prefixKey || /^!@/;
-                $.each(obj, function (key, value) {
+                $.each(obj, function(key, value) {
 
                     // Only process strings
                     if (!skipKeys || skipKeys.indexOf(key) == -1) {
@@ -65,8 +64,7 @@ define( [
                                 newObj[key] = translatedValue;
                                 return;
                             }
-                        }
-                        else if (typeof value === 'object') {
+                        } else if (typeof value === 'object') {
                             // Value is an object so we need to delegate recursively
                             newObj[key] = ComponentUtil.processObjL10n(value, skipKeys, prefixKey);
                             return;
@@ -91,7 +89,7 @@ define( [
             if (obj) {
                 $.each(obj, function(key, value) {
 
-                    if (typeof value !== "object") {
+                    if (typeof value !== 'object') {
                         if (value !== undefined) {
                             values.push(value);
                         }
@@ -110,24 +108,24 @@ define( [
          * @param  {array} params parameters given to the format function to replace in the source
          * @return {string}        Formatted string
          */
-        format : function( source, params ) {
+        format : function(source, params) {
             var self = this;
 
-            if ( arguments.length === 1 ) {
+            if (arguments.length === 1) {
                 return function() {
                     var args = $.makeArray(arguments);
                     args.unshift(source);
-                    return self.format.apply( this, args );
+                    return self.format.apply(this, args);
                 };
             }
-            if ( arguments.length > 2 && params.constructor !== Array  ) {
+            if (arguments.length > 2 && params.constructor !== Array) {
                 params = $.makeArray(arguments).slice(1);
             }
-            if ( params.constructor !== Array ) {
-                params = [ params ];
+            if (params.constructor !== Array) {
+                params = [params];
             }
-            $.each(params, function( i, n ) {
-                source = source.replace( new RegExp("\\{" + i + "\\}", "g"), function() {
+            $.each(params, function(i, n) {
+                source = source.replace(new RegExp('\\{' + i + '\\}', 'g'), function() {
                     return n;
                 });
             });
@@ -145,7 +143,7 @@ define( [
                 return false;
             }
             // Most common and leaf values
-            if (dataType === 'undefined' || data === null || data === "" || data === '0' || data === 0) {
+            if (dataType === 'undefined' || data === null || data === '' || data === '0' || data === 0) {
                 return true;
             }
             // Strings
@@ -158,7 +156,7 @@ define( [
             }
             // Arrays
             if (Array.isArray(data)) {
-                return (data.length === 0) ? true : (function(that){
+                return (data.length === 0) ? true : (function(that) {
                     var isEmpty = true;
                     for (var i = 0, len = data.length; i < len; i++) {
                         if (!that.isEmptyObject.call(that, data[i])) {
@@ -219,7 +217,7 @@ define( [
                     obj : source.obj
                 };
 
-                destiny =  newDestiny;
+                destiny = newDestiny;
             }
 
             var sourceObjectCopy = $.extend({}, source.obj[source.key]);

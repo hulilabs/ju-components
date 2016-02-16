@@ -12,7 +12,7 @@
 /**
  * Spiner test
  */
-define( [
+define([
             'jquery',
             'ju-components/base',
             'ju-components/resource/css-loader',
@@ -20,7 +20,7 @@ define( [
             'text!ju-components/blocks/error-handler/style.css',
             'text!ju-components/blocks/error-handler/template.html'
         ],
-        function (
+        function(
             $,
             BaseComponent,
             CssLoader,
@@ -32,18 +32,18 @@ define( [
     'use strict';
 
     var BaseErrorHandler = BaseComponent.extend({
-        init : function () {
+        init : function() {
             this.S = {
                 reloadPage : '.reload-page'
             };
             this._super.apply(this, arguments);
         },
-        configureComponent : function () {
+        configureComponent : function() {
             this.appendToView(template);
             CssLoader.getInst().appendInlineStyles(stylesText, this.$insertionPoint);
         },
-        bindEvents : function () {
-            this.t.$reloadPage.on('click', function () {
+        bindEvents : function() {
+            this.t.$reloadPage.on('click', function() {
                 window.location.reload();
             });
         }

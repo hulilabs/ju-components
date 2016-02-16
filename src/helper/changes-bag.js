@@ -9,13 +9,13 @@
  * (c) Huli Inc
  */
 
-define( [
+define([
             'require',
             'jquery',
             'ju-shared/class',
             'ju-components/base'
         ],
-        function (
+        function(
             require,
             $,
             Class,
@@ -27,7 +27,7 @@ define( [
      *
      */
     var ChangesBag = Class.extend({
-        init : function (changesTracker) {
+        init : function(changesTracker) {
             this.changesTracker = changesTracker;
             /*
             Stores the changes map given the root component
@@ -49,12 +49,12 @@ define( [
          * @param  {[type]} changedComponents [description]
          * @return {[type]}                   [description]
          */
-        buildChangesMap : function (rootComponent, changedComponents) {
+        buildChangesMap : function(rootComponent, changedComponents) {
             var self = this;
 
             this.rootComponent = rootComponent;
 
-            $.each(changedComponents, function (index, changedComponent) {
+            $.each(changedComponents, function(index, changedComponent) {
                 var directChild = BaseComponent
                                 .searchComponentInDescendants(
                                     rootComponent,
@@ -69,7 +69,7 @@ define( [
                     if (!mapEntry) {
                         mapEntry = {
                             childComponent : directChild,
-                            changedComponents : [ changedComponent ]
+                            changedComponents : [changedComponent]
                         };
                         self.changesMap[childId] = mapEntry;
                     } else {
@@ -85,8 +85,8 @@ define( [
          *
          * @return Array ]
          */
-        getChangedChildrenInstances : function () {
-            var childrenInstances = $.map(this.changesMap, function (obj /* , key */) {
+        getChangedChildrenInstances : function() {
+            var childrenInstances = $.map(this.changesMap, function(obj /* , key */) {
                 return obj.childComponent;
             });
             return childrenInstances;
@@ -94,16 +94,16 @@ define( [
         /**
          * Removes all the modified components from the Changes Tracker instance
          */
-        commit : function () {
+        commit : function() {
             var self = this;
-            $.each(this.changesMap, function (key, mapEntry) {
+            $.each(this.changesMap, function(key, mapEntry) {
                 self.changesTracker.removeFromChangedComponents(mapEntry.changedComponents);
             });
         }
     });
 
     ChangesBag.classMembers({
-        createInst : function (changesTracker, rootComponent, changedComponents) {
+        createInst : function(changesTracker, rootComponent, changedComponents) {
 
             var changesBag = new ChangesBag(changesTracker);
             changesBag.buildChangesMap(rootComponent, changedComponents);
