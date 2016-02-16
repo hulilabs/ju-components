@@ -34,8 +34,7 @@ define([
         MSG_NOT_LOADED_L10N = 'ResourceLoader: L10n key is not loaded yet:',
         MSG_LOADING_OPTIONS_DATA = 'ResourceLoader: loading options data:',
         MSG_NOT_LOADED_OPTIONS_DATA = 'ResourceLoader: Optins data key is not loaded yet:',
-        MSG_LOADING_CLIENT_VAR = 'ResourceLoader: loading client var:',
-        MSG_UNKNOWN_CLIENT_VAR = 'ResourceLoader: Client var is not loadable:';
+        MSG_LOADING_CLIENT_VAR = 'ResourceLoader: loading client var:';
 
     /**
      * This strategy loads the static resources from public accesible

@@ -883,7 +883,7 @@ define([
                     if (opts.flatten) {
                         results = results.concat(localResult);
                     } else {
-                        results['data'] = localResult;
+                        results.data = localResult;
                     }
                 }
             }
@@ -914,7 +914,7 @@ define([
                 });
 
                 if (!opts.flatten) {
-                    results['components'] = components;
+                    results.components = components;
                 }
             }
 

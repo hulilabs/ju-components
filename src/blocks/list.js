@@ -800,7 +800,7 @@ define([
                 });
 
                 if (!opts.flatten) {
-                    results['components'] = componentsResults;
+                    results.components = componentsResults;
                 }
             }
 
