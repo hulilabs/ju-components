@@ -348,6 +348,15 @@ define([
             this.opts = ComponentUtil.processObjL10n(this.opts, ['opts', 'childrenDef', 'template']);
         },
         /**
+         * Children definition safe-setter
+         * @param {object} childrenDef standard children definitions
+         */
+        setChildrenDefinition : function(childrenDef) {
+            childrenDef = childrenDef || {};
+            // Clone definition to avoid direct references
+            this.childrenDef = $.extend(true, {}, childrenDef);
+        },
+        /**
          * Setups the children components
          */
         childrenSetup : function() {
