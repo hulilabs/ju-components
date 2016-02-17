@@ -351,7 +351,7 @@ define([
          * Children definition safe-setter
          * @param {object} childrenDef standard children definitions
          */
-        setChildrenDefinition : function (childrenDef) {
+        setChildrenDefinition : function(childrenDef) {
             childrenDef = childrenDef || {};
             // Clone definition to avoid direct references
             this.childrenDef = $.extend(true, {}, childrenDef);
