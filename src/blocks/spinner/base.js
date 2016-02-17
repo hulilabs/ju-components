@@ -12,11 +12,11 @@
 /**
  * Spiner test
  */
-define( [
+define([
             'jquery',
             'ju-components/blocks/base-ui'
         ],
-        function (
+        function(
             $,
             BaseUI
         ) {
@@ -33,14 +33,13 @@ define( [
                 visible : false
             });
             spinnerInst.isRootComponent = true;
-            var promise = spinnerInst.load($insertionPoint).then(function(){
+            var promise = spinnerInst.load($insertionPoint).then(function() {
                 return spinnerInst;
             });
 
             return promise;
         }
     });
-
 
     // Exporting module
     return BaseSpinner;

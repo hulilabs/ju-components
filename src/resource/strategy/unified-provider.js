@@ -17,7 +17,7 @@ define([
             'ju-components/resource/css-loader',
             'ju-components/resource/resource-proxy'
         ],
-        function (
+        function(
             $,
             Class,
             DependencyLoader,
@@ -39,7 +39,7 @@ define([
      *
      */
     var UnifiedProviderStrategy = Class.extend({
-        init : function (opts) {
+        init : function(opts) {
 
             // Extend the default options
             this.opts = $.extend({}, opts);
@@ -65,17 +65,17 @@ define([
                 context : resourceCollectorMap.context
             };
          */
-        fetchResources : function (resourceMap) {
+        fetchResources : function(resourceMap) {
 
             // Request the CSS files using the CSS loader
             this.cssLoader.get(resourceMap.cssFile);
 
             var self = this,
-                promise = new Promise(function (resolve, reject) {
+                promise = new Promise(function(resolve, reject) {
                     var resourcePromise =
                         self.resourceProxy.getResources(resourceMap)();
                     resourcePromise
-                        .then(function (response) {
+                        .then(function(response) {
                             // Remove the resources from the loading resources map
                             var data = response.data.response_data;
                             // Returns the array of components in the same order they were defined

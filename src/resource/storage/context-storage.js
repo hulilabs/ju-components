@@ -13,11 +13,11 @@
  * Application config client-side module
  * This layer provides access to server side application settings
  */
-define( [
+define([
             'jquery',
             'ju-shared/client-vars-manager'
         ],
-        function (
+        function(
             $,
             ClientVarsManager
         ) {
@@ -28,7 +28,7 @@ define( [
      * Contains application settings coming from the server side
      */
     var ContextStorage = ClientVarsManager.extend({
-        init : function () {
+        init : function() {
             this._super.apply(this, arguments);
         },
         /**
@@ -47,7 +47,7 @@ define( [
          * @param  {string} groupName Optional. Name of the group
          *                            of vars that will be appended
          */
-        append : function (vars) {
+        append : function(vars) {
 
             var varsDict = this.varsDictionary;
             // Copy all the new vars to the current instance dictionary
@@ -60,7 +60,7 @@ define( [
         /**
          * Gets a particlar value by the key and the component id
          */
-        get : function (handlerName, component) {
+        get : function(handlerName, component) {
             var handlerData = this.varsDictionary[handlerName];
             if (handlerData == null) {
                 Logger.error("ContextStorage: Couldn't find handler data for key", handlerName);
@@ -68,7 +68,7 @@ define( [
             }
 
             if (!component.id) {
-                Logger.error("ContextStorage: Cannot retrieve data when component id is not provided");
+                Logger.error('ContextStorage: Cannot retrieve data when component id is not provided');
                 return;
             }
 

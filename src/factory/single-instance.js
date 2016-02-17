@@ -12,11 +12,11 @@
 /**
  * Base Component factory
  */
-define( [
+define([
             'require',
             'ju-shared/class'
         ],
-        function (
+        function(
             require,
             Class
         ) {
@@ -26,7 +26,7 @@ define( [
      * Loads and instanciates a single instance of a component
      */
     var SingleInstanceFactory = Class.extend({
-            getComponent : function (componentDefObj, defaultCompPath) {
+            getComponent : function(componentDefObj, defaultCompPath) {
 
                 if (!componentDefObj || typeof componentDefObj === 'string') {
                     componentDefObj = {
@@ -34,8 +34,8 @@ define( [
                     };
                 }
 
-                var instancePromise = new Promise(function (resolve /* , reject */) {
-                    require([ componentDefObj.component ], function (SpinnerClass) {
+                var instancePromise = new Promise(function(resolve /* , reject */) {
+                    require([componentDefObj.component], function(SpinnerClass) {
                         var compInstance = new SpinnerClass(componentDefObj.opts);
                         compInstance.isRootComponent = true;
 

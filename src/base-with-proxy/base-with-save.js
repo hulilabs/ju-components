@@ -12,13 +12,13 @@
 /**
  * Base component with proxy
  */
-define( [
+define([
             'jquery',
             'ju-components/base-with-proxy',
             'ju-components/base-with-proxy/save-strategy/all',
             'ju-components/base-with-proxy/save-strategy/changed'
         ],
-        function (
+        function(
             $,
             BaseComponentWithProxy,
             SaveAllStrategy,
@@ -28,7 +28,7 @@ define( [
     'use strict';
 
     var BaseWithSave = BaseComponentWithProxy.extend({
-        init : function () {
+        init : function() {
 
             this.setOptions({
                 saveStrategy : BaseWithSave.STRATEGY.ALL,
@@ -38,17 +38,17 @@ define( [
 
             switch (this.opts.saveStrategy) {
                 case BaseWithSave.STRATEGY.CHANGED:
-                    this.payloadHandler =  new SaveChangedStrategy();
+                    this.payloadHandler = new SaveChangedStrategy();
                     break;
                 case BaseWithSave.STRATEGY.ALL:
                 case BaseWithSave.STRATEGY.NONE:
-                    this.payloadHandler =  new SaveAllStrategy();
+                    this.payloadHandler = new SaveAllStrategy();
             }
         },
         /**
          * Extra setup for the base with save component
          */
-        setup : function () {
+        setup : function() {
             if (this.payloadHandler.setup) {
                 this.payloadHandler.setup.apply(this, arguments);
             }
@@ -60,7 +60,7 @@ define( [
          *
          * @return Promise Save promise
          */
-        saveData : function () {
+        saveData : function() {
             var promise = this.payloadHandler.saveData.apply(this, arguments);
             return promise;
         },
@@ -71,19 +71,19 @@ define( [
          * @param  object dataToSave data to be saved
          * @return Promise  A save promise
          */
-        submitDataToServer : function (dataToSave) { // jshint ignore:line
+        submitDataToServer : function(dataToSave) { // jshint ignore:line
         },
         /**
          * Handles the save success event triggered from the payloadHandler by
          * bypassing the event to the higher level.
          */
-        onSaveSuccess: function(response) {
+        onSaveSuccess : function(response) {
             this.trigger(BaseWithSave.EV.SAVE_SUCCESS, response);
         },
         /**
          * Returns a rejected promise so it's handled afterwars
          */
-        getInvalidFieldsPromise : function (errors) {
+        getInvalidFieldsPromise : function(errors) {
             return Promise.reject(errors);
         },
         /**
@@ -94,7 +94,7 @@ define( [
 
             var childrenRecursiveOpts =
                 {
-                    callOnChildren : function (comp) {
+                    callOnChildren : function(comp) {
                         // We only call the validate method on the children if the validate method
                         // does not exists in the current component.
                         // The validate method is recursive by nature, this is why we prevent
@@ -105,15 +105,15 @@ define( [
                 };
 
             var childrenErrors = this.callRecursively(childrenRecursiveOpts, 'validate'),
-                errors = $.grep(childrenErrors,function(n){ return n; }); //ComponentUtils.flatten(childrenErrors);
+                errors = $.grep(childrenErrors,function(n) { return n; }); //ComponentUtils.flatten(childrenErrors);
 
             return errors;
         }
     });
 
     BaseWithSave.classMembers({
-        EV: {
-            SAVE_SUCCESS: 'saveSuccess',
+        EV : {
+            SAVE_SUCCESS : 'saveSuccess',
             SAVE_ERROR : 'saveError',
             CANCELLED : 'onCancel'
         },

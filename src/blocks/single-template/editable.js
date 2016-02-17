@@ -13,12 +13,12 @@
 /**
  * Single Template
  */
-define( [
+define([
             'ju-components/blocks/editable',
             'ju-components/resource/storage/template-storage',
             'ju-shared/l10n'
         ],
-        function (
+        function(
             EditableComponent,
             TemplateStorage,
             L10n
@@ -33,9 +33,9 @@ define( [
     };
 
     var SingleTemplateEditableComponent = EditableComponent.extend({
-    	/**
-    	 * @param args (array) bypass extended constructor arguments
-    	 */
+        /**
+         * @param args (array) bypass extended constructor arguments
+         */
         init : function(args, templatePath, resourcesDef, childrenDef) {
 
             // Options
@@ -65,7 +65,7 @@ define( [
             // L10n labels
             this.appendL10n(this.opts.emptytext);
         },
-        configureComponent : function () {
+        configureComponent : function() {
             // Single Template
             if (this.templatePath) {
                 var template = TemplateStorage.getInst().get(this.templatePath);
@@ -79,8 +79,8 @@ define( [
 
                 // Simulate same anchor used by jquery editable
                 var $a = $('<a>', {
-                    class: 'editable editable-empty editable-template-emptytext',
-                    tabindex: -1
+                    class : 'editable editable-empty editable-template-emptytext',
+                    tabindex : -1
                 }).text(L10n.t(this.opts.emptytext));
                 this.$view.append($a);
             }

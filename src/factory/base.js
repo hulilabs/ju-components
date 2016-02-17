@@ -12,12 +12,12 @@
 /**
  * Base Component factory
  */
-define( [
+define([
             'require',
             'jquery',
             'ju-shared/class'
         ],
-        function (
+        function(
             require,
             $,
             Class
@@ -29,19 +29,19 @@ define( [
      * Each component will have a dictionary of children components
      */
     var ComponentFactoryBase = Class.extend({
-            init : function () {
+            init : function() {
 
             },
             /**
              * Creates new instances of the defined map
              * @return map A map with instances of each component
              */
-            createInstances : function (componentsDefinition, parentComponent, loadArgs, childrenExtendedOpts) {
+            createInstances : function(componentsDefinition, parentComponent, loadArgs, childrenExtendedOpts) {
 
                 var self = this,
                     compDef = componentsDefinition,
                     parentComp = parentComponent,
-                    promise = new Promise(function (resolve, reject) {
+                    promise = new Promise(function(resolve, reject) {
 
                         if (!compDef) {
                             Logger.error('ComponentFactoryBase: definition is empty...', compDef);
@@ -53,19 +53,17 @@ define( [
                             // Create a copy of the compponents definition
                             compDefinition = $.extend(true, {}, compDef),
                             // Creates a map of the components definition
-                            modulesPaths = $.map(compDefinition, function (def) {
+                            modulesPaths = $.map(compDefinition, function(def) {
                                 return def.component;
                             });
-
 
                         // @niceToHave At this point if the childrenExtendedOpts contains paths to
                         // config files as the opts value, then we would need to add them to the modulesPaths
                         // so it fetches the config files along with the components themselves
 
-
                         log('ComponentFactoryBase: Fetching the following modules files', modulesPaths);
                         // Load all the modules
-                        require(modulesPaths, function () {
+                        require(modulesPaths, function() {
                             // call the fetched children method of the children
 
                             var componentsClasses = arguments,
@@ -107,7 +105,7 @@ define( [
                             var childrenReadyPromise = Promise.all(childrenReadyPromises);
 
                             childrenReadyPromise
-                                .then(function () {
+                                .then(function() {
                                     // susbcribeToAllComponents for the Children fetched event
                                     log('ComponentFactoryBase: Dependencies loaded...');
 
@@ -124,7 +122,7 @@ define( [
              * child compponent that will be instanciated.
              *
              */
-            processExtendedOpts : function (key, childDefinition, opts, childrenExtendedOpts) {
+            processExtendedOpts : function(key, childDefinition, opts, childrenExtendedOpts) {
                 var childExtendedOpts;
                 // Mix the options for the current component
                 // Extension opts contains the options for the descendants

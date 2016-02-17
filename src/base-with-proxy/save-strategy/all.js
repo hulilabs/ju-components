@@ -12,12 +12,12 @@
 /**
  * Save strategy : All
  */
-define( [
+define([
             'jquery',
             'ju-components/base-with-proxy/payload-handler',
             'ju-components/helper/changes-tracker'
         ],
-        function (
+        function(
             $,
             PayloadHandler,
             ChangesTracker
@@ -30,7 +30,7 @@ define( [
      *
      **************************************************/
     var SaveAllStrategy = PayloadHandler.extend({
-    	setup : function () {
+        setup : function() {
             /*
                 At this point we know that the notification center has already been set
              */
@@ -44,7 +44,7 @@ define( [
          *
          * @return Promise Save promise
          */
-        saveData : function () {
+        saveData : function() {
             // Allow force all data in this model
             var data,
                 savePromise,
@@ -58,7 +58,7 @@ define( [
 
                 savePromise = this.submitDataToServer(data);
 
-                savePromise.then(function (response) {
+                savePromise.then(function(response) {
                     self.onSaveSuccess(response);
                 });
             } else {

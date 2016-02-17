@@ -13,11 +13,11 @@
  * Application config client-side module
  * This layer provides access to server side application settings
  */
-define( [
+define([
             'jquery',
             'ju-shared/client-vars-manager'
         ],
-        function (
+        function(
             $,
             ClientVarsManager
         ) {

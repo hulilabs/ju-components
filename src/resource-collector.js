@@ -13,11 +13,11 @@
 /**
  * Resource Collector
  */
-define( [
+define([
             'ju-shared/class',
             'ju-components/resource/resource-manager'
         ],
-        function (
+        function(
             Class,
             ResourceManager
         ) {
@@ -42,7 +42,7 @@ define( [
         /**
          * Add a resource map to the current collector
          */
-        addResources : function (resourceMap, component) {
+        addResources : function(resourceMap, component) {
             if (!resourceMap) {
                 // Nothing to add
                 return;
@@ -92,7 +92,7 @@ define( [
         /**
          * Add CSS files to the collector
          */
-        addCssFiles : function (filePaths) {
+        addCssFiles : function(filePaths) {
             if (!filePaths) {
                 // Nothing to add
                 return;
@@ -152,7 +152,7 @@ define( [
          *     }
          * }
          */
-        addContextRequest : function (contextRequest, component) {
+        addContextRequest : function(contextRequest, component) {
 
             if (!contextRequest) {
                 // Nothing to add
@@ -167,7 +167,7 @@ define( [
                 return;
             }
 
-            $.each(contextRequest, function (key, value) {
+            $.each(contextRequest, function(key, value) {
                 var componentContext = {};
                 componentContext[componentId] = value;
 
@@ -179,7 +179,7 @@ define( [
             });
 
         },
-        addKeys : function (keys, collection, storage) {
+        addKeys : function(keys, collection, storage) {
             if (!keys) {
                 // Nothing to add
                 return;
@@ -190,14 +190,12 @@ define( [
                 var key = keys[idx];
                 if (key &&
                     !resourceManager.isLoaded(storage, key) &&
-                    (collection.indexOf(key) === -1))
-                {
+                    (collection.indexOf(key) === -1)) {
                     collection.push(key);
                 }
             }
         }
     });
-
 
     /**
      * Class members
@@ -206,7 +204,7 @@ define( [
         /**
          * Returns a new instance of the Resource Collector
          */
-        createInst : function () {
+        createInst : function() {
             var resourceCollector = new ResourceCollector();
             return resourceCollector;
         }

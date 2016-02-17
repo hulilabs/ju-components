@@ -9,7 +9,7 @@
  * (c) Huli Inc
  */
 
-define( [
+define([
             'require',
             'jquery',
             'ju-shared/observable-class',
@@ -18,7 +18,7 @@ define( [
             'ju-components/blocks/upload',
             'ju-components/helper/changes-bag'
         ],
-        function (
+        function(
             require,
             $,
             ObservableClass,
@@ -33,12 +33,12 @@ define( [
      * The ChangesTracker will be used to
      */
     var ChangesTracker = ObservableClass.extend({
-        init : function (backboneInst) {
+        init : function(backboneInst) {
             this.changedComponents = [];
             this.backbone = backboneInst;
             this.isTracking = false;
         },
-        track : function () {
+        track : function() {
             if (this.isTracking) {
                 return;
             }
@@ -62,7 +62,7 @@ define( [
         /**
          * Called when the user activates the edit mode of a component
          */
-        editModeHandler : function(){
+        editModeHandler : function() {
             log('ChangesTracker: component edit mode activated');
         },
 
@@ -70,7 +70,7 @@ define( [
          * Called when a component was modified
          * @return {[type]} [description]
          */
-        modifiedHandler : function (changedComponent) {
+        modifiedHandler : function(changedComponent) {
             if (this.changedComponents.indexOf(changedComponent) === -1) {
                 // Only add this event
                 log('ChangesTracker: component change registered');
@@ -85,7 +85,7 @@ define( [
          * @param  {[type]} rootComponent [description]
          * @return ChangesBag               [description]
          */
-        getChangesBag : function (rootComponent) {
+        getChangesBag : function(rootComponent) {
             var changesBag = ChangesBag.createInst(this, rootComponent, this.changedComponents);
             return changesBag;
         },
@@ -94,9 +94,9 @@ define( [
          * @param  {[type]} components [description]
          * @return {[type]}            [description]
          */
-        removeFromChangedComponents : function (components) {
+        removeFromChangedComponents : function(components) {
             var self = this;
-            $.each(components, function (index, component) {
+            $.each(components, function(index, component) {
                 var componentIndex = self.changedComponents.indexOf(component);
                 if (componentIndex > -1) {
                     self.changedComponents.splice(componentIndex, 1);
@@ -113,7 +113,7 @@ define( [
             SAVE_READY : 'saveReady',
             SAVE_NOT_READY : 'saveNotReady'
         },
-        getInst : function (backboneInst) {
+        getInst : function(backboneInst) {
 
             // check if the notification center has already an id
             if (!backboneInst) {

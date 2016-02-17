@@ -19,12 +19,12 @@
  * @todo consider renaming this class to base-with-data
  *       and moved all data management to this class
  */
-define( [
+define([
             'jquery',
             'ju-components/base',
             'ju-components/util'
         ],
-        function (
+        function(
             $,
             BaseComponent,
             ComponentUtil
@@ -36,7 +36,7 @@ define( [
     var READONLY_CLASS_PREFIX = 'read-only';
 
     var BaseUIComponent = BaseComponent.extend({
-        init : function () {
+        init : function() {
 
             this.setOptions({
                 readOnly : false,
@@ -50,7 +50,7 @@ define( [
                 dataEmpty : 'data-empty'
             };
         },
-        setup : function () {
+        setup : function() {
             if (this.opts.readOnly) {
                this.setOption('readOnly', true, true);
             }
@@ -71,16 +71,16 @@ define( [
          * @warning do not call _super on this method
          * @return {object} stateChangeResult
          */
-        cascadeStateChange : function (eventInfo) {
+        cascadeStateChange : function(eventInfo) {
             var self = this;
 
             var childrenRecursiveOpts = {
-                callLocally : function (comp) {
+                callLocally : function(comp) {
                     // We only call the cascadeStateChange method again for this instance
                     // otherwise we would cause an infinite loop
                     return comp !== self;
                 },
-                callOnChildren : function (comp) {
+                callOnChildren : function(comp) {
                     // We only call the cascadeStateChange method on the children if the cascadeStateChange method
                     // does not exists in the current component.
                     // The cascadeStateChange method is recursive by nature, this is why we prevent
@@ -119,7 +119,7 @@ define( [
          * Subclasses must called _super to get emptiness state and bypass it back
          * @param {boolean} isEmpty : final emptiness state
          */
-        onCascadeCheckEmptiness : function (childrenResults) {
+        onCascadeCheckEmptiness : function(childrenResults) {
             var isEmpty = true; // asume is empty by default
 
             // Determines emptiness state based on children results
@@ -134,7 +134,7 @@ define( [
          * - inst    {Object}  reference to current component
          * - isEmpty {boolean} emptiness state (by default true)
          */
-        stateChangeResult : function () {
+        stateChangeResult : function() {
             return this.composeResultObject(arguments, BaseUIComponent.RESULT_DEFAULT_OBJECTS.STATE_CHANGE);
         },
         /**
@@ -143,7 +143,7 @@ define( [
         getData : function() {
             var value = this._super.apply(this, arguments);
 
-            return  (this.opts.visible) ? value : undefined;
+            return (this.opts.visible) ? value : undefined;
         },
         /**
          * Sets the data of the current component plus the values of the children components
@@ -151,7 +151,7 @@ define( [
          *   - success : {bool} set succesful
          * @warn DO NOT call _super on this method
          */
-        setData : function (data /* , extraDataFromParent */) {
+        setData : function(data /* , extraDataFromParent */) {
             var self = this,
                 setSuccessfull = false,
                 isEmpty = self.opts.visible, // asume emptiness based on visibility
@@ -232,7 +232,7 @@ define( [
                 result.isEmpty = isEmpty;
                 self.setEmptiness(isEmpty);
             } else if (localEmptiness instanceof Promise) {
-                result.promise = localEmptiness.then(function(isLocalEmpty){
+                result.promise = localEmptiness.then(function(isLocalEmpty) {
                     return self.setEmptiness(isLocalEmpty);
                 });
             }
@@ -248,14 +248,14 @@ define( [
          * - isEmpty {boolean} emptiness state
          * - success {boolean} set data failed or succeded
          */
-        setDataResult : function () {
+        setDataResult : function() {
             // 'promise' and 'isEmpty' should not be included as default due to their optional nature
             return this.composeResultObject(arguments, BaseUIComponent.RESULT_DEFAULT_OBJECTS.SET_DATA);
         },
         /**
          * Options manager
          */
-        setOption : function (option, value, recursive) {
+        setOption : function(option, value, recursive) {
             switch (option) {
                 case 'readOnly':
                     this.onReadOnly(value);
@@ -266,7 +266,7 @@ define( [
         /**
          * Read only
          */
-        onReadOnly : function (readOnly) {
+        onReadOnly : function(readOnly) {
             this.opts.readOnly = readOnly || false;
 
             // Add read only to editable element
@@ -279,7 +279,7 @@ define( [
                 this.toggleReadOnlyMode(this.$view);
             }
         },
-        toggleReadOnlyMode : function (view) {
+        toggleReadOnlyMode : function(view) {
             if (view && this.opts.readOnly) {
                 view.toggleClass(READONLY_CLASS_PREFIX, this.opts.readOnly);
             }
@@ -304,7 +304,7 @@ define( [
          * @param {array|object|boolean} childrenEmptiness set of children emptiness information
          * @abstract
          */
-        checkLocalEmptiness : function (childrenEmptiness) {
+        checkLocalEmptiness : function(childrenEmptiness) {
             var self = this,
                 // some checkLocalEmptiness childrenEmptiness is a boolean (resolved emptiness, like in lists)
                 // assume empty by default
@@ -364,7 +364,7 @@ define( [
                 // We will resolve this emptiness check after promises are resolved too
                 // Resolved promise callback considers emptiness check result (emptyState)
                 var allChildrenEmptiness = Promise.all(childrenEmptinessPromisesArray),
-                    chainAllChildrenEmptiness = allChildrenEmptiness.then(function(results){
+                    chainAllChildrenEmptiness = allChildrenEmptiness.then(function(results) {
                         var isLocalEmpty = self.checkLocalEmptiness(results[0]);
                         // Empty if promise results are empty and outter result is empty too
                         return emptyState && isLocalEmpty;
@@ -386,7 +386,7 @@ define( [
          * @param  {boolean} isEmpty emptiness state
          * @return {boolean} isEmpty processed emptiness state
          */
-        setEmptiness : function (isEmpty) {
+        setEmptiness : function(isEmpty) {
             // Visible
             if (!this.opts.visible) {
                 isEmpty = true;
@@ -427,7 +427,7 @@ define( [
         getResultDefaultObject : function() {
             var resultDefaultObject = {};
 
-            for(var i = 0, len = arguments.length; i < len; i++) {
+            for (var i = 0, len = arguments.length; i < len; i++) {
                 var key = arguments[i];
                 resultDefaultObject[key] = BaseUIComponent.RESULT_DEFAULTS[key];
             }
