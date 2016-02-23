@@ -10,7 +10,7 @@
  */
 
 /**
- * Save strategy : Inmediate
+ * Save strategy : Immediate
  */
 define([
             'jquery',
@@ -29,19 +29,19 @@ define([
      * IMPORTANT : All the methods here called in the scope of the base with save instance
      *
      **************************************************/
-    var SaveInmediateStrategy = PayloadHandler.extend({
+    var SaveImmediateStrategy = PayloadHandler.extend({
         setup : function() {
             if (this.opts.tracker) {
-                this.inmediateTracker = this.opts.tracker.getInst(this.backbone);
+                this.immediateTracker = this.opts.tracker.getInst(this.backbone);
             } else {
-                Logger.error('Dashboard: a InmediateTracker is needed to configure this component strategy');
+                Logger.error('Dashboard: a ImmediateTracker is needed to configure this component strategy');
             }
 
             // Subscribe to events
-            this.inmediateTracker.track();
+            this.immediateTracker.track();
 
             // listeing changed event
-            this.inmediateTracker.on(ChangesTracker.EV.COMPONENT_CHANGED, $.proxy(this.saveData, this));
+            this.immediateTracker.on(ChangesTracker.EV.COMPONENT_CHANGED, $.proxy(this.saveData, this));
         },
 
         saveData : function(triggeredEvent, dataToSave) {
@@ -57,5 +57,5 @@ define([
     });
 
     // Exporting module
-    return SaveInmediateStrategy;
+    return SaveImmediateStrategy;
 });
