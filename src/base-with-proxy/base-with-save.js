@@ -16,13 +16,15 @@ define([
             'jquery',
             'ju-components/base-with-proxy',
             'ju-components/base-with-proxy/save-strategy/all',
-            'ju-components/base-with-proxy/save-strategy/changed'
+            'ju-components/base-with-proxy/save-strategy/changed',
+            'ju-components/base-with-proxy/save-strategy/immediate'
         ],
         function(
             $,
             BaseComponentWithProxy,
             SaveAllStrategy,
-            SaveChangedStrategy
+            SaveChangedStrategy,
+            SaveImmediateStrategy
         ) {
 
     'use strict';
@@ -39,6 +41,9 @@ define([
             switch (this.opts.saveStrategy) {
                 case BaseWithSave.STRATEGY.CHANGED:
                     this.payloadHandler = new SaveChangedStrategy();
+                    break;
+                case BaseWithSave.STRATEGY.IMMEDIATE:
+                    this.payloadHandler = new SaveImmediateStrategy();
                     break;
                 case BaseWithSave.STRATEGY.ALL:
                 case BaseWithSave.STRATEGY.NONE:
@@ -120,7 +125,8 @@ define([
         STRATEGY : {
             ALL : 'all',
             CHANGED : 'changed',
-            NONE : 'none'
+            NONE : 'none',
+            IMMEDIATE : 'immediate',
         }
     });
 
