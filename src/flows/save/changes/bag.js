@@ -104,7 +104,6 @@ define([
 
     ChangesBag.classMembers({
         createInst : function(changesTracker, rootComponent, changedComponents) {
-
             var changesBag = new ChangesBag(changesTracker);
             changesBag.buildChangesMap(rootComponent, changedComponents);
             return changesBag;

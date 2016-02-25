@@ -15,7 +15,7 @@ define([
             'ju-shared/dependency-loader',
             'ju-shared/l10n',
             'ju-components/resource/css-loader',
-            'ju-components/resource/resource-proxy',
+            'ju-components/resource/proxy',
             'ju-components/resource/storage/options-data-storage'
         ],
         function(

@@ -61,7 +61,6 @@ define([
 
     Backbone.classMembers({
         SHARED : {
-            IMMEDIATE_TRACKER : 'immediateTracker',
             CHANGES_TRACKER : 'changesTracker',
             PATIENT_INFO : 'patientInfo'
         }
