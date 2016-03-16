@@ -15,7 +15,7 @@ define([
             'ju-shared/dependency-loader',
             'ju-shared/l10n',
             'ju-components/resource/css-loader',
-            'ju-components/resource/resource-proxy'
+            'ju-components/resource/proxy'
         ],
         function(
             $,
@@ -69,21 +69,31 @@ define([
 
             // Request the CSS files using the CSS loader
             this.cssLoader.get(resourceMap.cssFile);
+            // makes sure the css files aren't part of the request
+            delete(resourceMap.cssFile);
 
-            var self = this,
-                promise = new Promise(function(resolve, reject) {
-                    var resourcePromise =
-                        self.resourceProxy.getResources(resourceMap)();
-                    resourcePromise
-                        .then(function(response) {
-                            // Remove the resources from the loading resources map
-                            var data = response.data.response_data;
-                            // Returns the array of components in the same order they were defined
-                            resolve(data);
-                        })
-                        ['catch'](reject);
-                });
-                return promise;
+            // after we remove the cssFile member, the resourceMap might be empty
+            // so we double check to don't make a pointless request of no resources
+            var isTheResourceMapEmpty = (Object.keys(resourceMap).length === 0);
+            if (!isTheResourceMapEmpty) {
+                var self = this,
+                    promise = new Promise(function(resolve, reject) {
+                        var resourcePromise =
+                            self.resourceProxy.getResources(resourceMap)();
+                        resourcePromise
+                            .then(function(response) {
+                                // Remove the resources from the loading resources map
+                                var data = response.data.response_data;
+                                // Returns the array of components in the same order they were defined
+                                resolve(data);
+                            })
+                            ['catch'](reject);
+                    });
+                    return promise;
+            } else {
+                return Promise.resolve(null);
+            }
+
         }
     });
 
