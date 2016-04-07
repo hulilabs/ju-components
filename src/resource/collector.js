@@ -15,7 +15,7 @@
  */
 define([
             'ju-shared/class',
-            'ju-components/resource/resource-manager'
+            'ju-components/resource/manager'
         ],
         function(
             Class,

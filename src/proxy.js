@@ -32,13 +32,15 @@ define([
             };
         },
         /**
-         * Query component data
-         * Only called first time the base-with-proxy is created
+         * Query initial component data
+         *
+         * IMPORTANT: 'fetch' is a naming convention for initial request for component data
+         *            not the same as 'get' prefix which refers to at-any-moment request
          *
          * @return Promise
          * @abstract
          */
-        getPayload : function(data, resolve, reject) {} // jshint ignore:line
+        fetch : function(data, resolve, reject) {} // jshint ignore:line
     });
 
     // Exports

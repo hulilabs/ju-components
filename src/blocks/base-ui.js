@@ -332,7 +332,7 @@ define([
                     // isEmpty can be undefined
                     // ..but promise AND isEmpty can't be processed
                     if (typeof childEmptinessPromise === 'undefined' && childEmptinessUndefined) {
-                        Logger.error('base-ui : checkLocalEmptiness : unkown empty state or promise', childrenEmptiness);
+                        Logger.error('base-ui : checkLocalEmptiness : unkown empty state or promise', childResult);
                     }
 
                     // Verify first if there is any unresolved promise
