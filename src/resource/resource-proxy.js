@@ -19,14 +19,18 @@ define([
                 ) {
     'use strict';
 
-    var ResourcesProxy = BaseProxy.extend({
+    var ResourceProxy = BaseProxy.extend({
         init : function(opts) {
             this._super(opts);
             /*
                 Resources related paths
              */
             this.EP = {};
-            this.EP.RESOURCES_API_PREFIX = BaseProxy.EP.API_PREFIX + 'component/resource';
+            this.EP.RESOURCES = BaseProxy.EP.API_PREFIX + 'component/resource';
+        },
+
+        setUrl : function(resourcesEndpointUrl) {
+            this.EP.RESOURCES = resourcesEndpointUrl;
         },
 
         getResources : function(resources, successCallback, errorCallback) {
@@ -35,7 +39,7 @@ define([
                 promiseFn = function() {
                     return new Promise(function(resolve, reject) {
                         var params = {
-                            url : self.EP.RESOURCES_API_PREFIX,
+                            url : self.EP.RESOURCES,
                             data : resources,
                             type : 'POST',
                             success : function() {
@@ -60,6 +64,6 @@ define([
     });
 
     // Exports
-    return ResourcesProxy;
+    return ResourceProxy;
 
 });
