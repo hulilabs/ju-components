@@ -10,8 +10,8 @@
  */
 
 define([
-            'ju-components/flows/save/changes-tracker',
-            'ju-components/flows/save/changes/collect-changed-components'
+            'ju-components/data-flow/save/changes-tracker',
+            'ju-components/data-flow/save/changes/collect-changed-components'
         ],
         function(
             ChangesTracker,

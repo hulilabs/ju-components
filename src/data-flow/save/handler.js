@@ -14,9 +14,9 @@
  */
 define([
             'ju-shared/observable-class',
-            'ju-components/flows/save/strategy',
-            'ju-components/flows/save/strategies/changed',
-            'ju-components/flows/save/strategies/immediate',
+            'ju-components/data-flow/save/strategy',
+            'ju-components/data-flow/save/strategies/changed',
+            'ju-components/data-flow/save/strategies/immediate',
             'ju-components/helper/options'
         ],
         function(
@@ -154,7 +154,7 @@ define([
          * Saves the data to the server using the proxy
          * Overwrite this method in the child classes
          * @abstract
-         * @see ju-components/flows/save/strategy
+         * @see ju-components/data-flow/save/strategy
          *
          * @param  object dataForProxy {'data' to be saved, 'metadata' for proxy only}
          * @return Promise  A save promise
@@ -170,7 +170,7 @@ define([
          * Handles the save success event triggered from the payloadHandler by
          * bypassing the event to the higher level.
          * @abstract
-         * @see ju-components/flows/save/strategy
+         * @see ju-components/data-flow/save/strategy
          */
         _onSaveSuccess : function(response) {
             this.trigger(SaveHandler.EV.SAVE_HANDLER_SUCCESS, response);

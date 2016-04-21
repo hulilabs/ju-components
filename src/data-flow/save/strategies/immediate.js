@@ -14,9 +14,9 @@
  */
 define([
             'jquery',
-            'ju-components/flows/save/strategy',
-            'ju-components/flows/save/changes-tracker',
-            'ju-components/flows/save/changes-tracker/immediate'
+            'ju-components/data-flow/save/strategy',
+            'ju-components/data-flow/save/changes-tracker',
+            'ju-components/data-flow/save/changes-tracker/immediate'
         ],
         function(
             $,

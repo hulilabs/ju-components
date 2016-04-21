@@ -13,7 +13,7 @@
  * Adds a changes bag to any changes tracker
  */
 define([
-            'ju-components/flows/save/changes/bag'
+            'ju-components/data-flow/save/changes/bag'
         ], function(
             ChangesBag
         ) {

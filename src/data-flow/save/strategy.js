@@ -15,7 +15,7 @@
 define([
             'ju-shared/observable-class',
             'ju-components/helper/options',
-            'ju-components/flows/save/changes-tracker'
+            'ju-components/data-flow/save/changes-tracker'
         ],
         function(
             ObservableClass,
