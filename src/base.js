@@ -17,7 +17,8 @@ define([
             'ju-shared/observable-class',
             'ju-shared/util',
             'ju-components/factory/base',
-            'ju-components/resource-collector',
+            'ju-components/helper/options',
+            'ju-components/resource/resource-collector',
             'ju-components/resource/resource-manager',
             'ju-components/util',
             'ju-components/backbone',
@@ -28,6 +29,7 @@ define([
             ObservableClass,
             Util,
             FactoryBase,
+            OptionsHelper,
             ResourceCollector,
             ResourceManager,
             ComponentUtil,
@@ -190,7 +192,9 @@ define([
             /**
              * Stores the options for this
              */
-            this.prepareOptions(opts);
+            this._initOptsManager();
+            this.optsManager.prepareOptions(opts);
+            this.opts = this.optsManager.getOptions();
 
             // Reference to the spinner
             this.spinnerComp = null;
@@ -422,33 +426,20 @@ define([
          */
         setupCompleted : function() { },
         /**
-         * Include options in the opts collector
-         * Set default options and override parents options
-         * Keeps the flow from child to parent (no untraceable flows with before and after super)
-         * - Child options always have precedence over parent options
-         * - Parent options should never overwrite children options
-         * @warn ALWAYS call setOptions BEFORE _super
-         * @param {object} class level options to queue
+         * Initialize options manager
+         * @see  OptionsHelper
+         */
+        _initOptsManager : function() {
+            this.optsManager = this.optsManager || new OptionsHelper();
+        },
+        /**
+         * Store options in manager
+         * @decorator
+         * @see  OptionsHelper
          */
         setOptions : function() {
-            this.optsCollector = this.optsCollector || [];
-            // Optimized array prepend
-            var i, argLen, len = this.optsCollector.length + arguments.length,
-                optsArr = new Array(len);
-
-            for (i = 0, argLen = arguments.length; i < argLen; i++) {
-                optsArr[i] = arguments[i];
-            }
-
-            for (i = 0; i < len; i++) {
-                optsArr.push(this.optsCollector[i]);
-
-            }
-            this.optsCollector = optsArr;
-        },
-        prepareOptions : function(forcedOpts) {
-            // Merge options collector
-            this.opts = $.extend.apply($, [true, {}].concat(this.optsCollector).concat([forcedOpts]));
+            this._initOptsManager();
+            this.optsManager.setOptions.apply(this.optsManager, arguments);
         },
         /**
          * Merge selectors into the selector dictionary (collector) used by _findLocalElems
