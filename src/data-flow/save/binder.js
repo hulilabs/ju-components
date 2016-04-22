@@ -135,6 +135,12 @@ define([
                 );
         },
 
+        /**
+         * On success, will call exit callback or [ui success callback and save success opt]
+         * @param  {Function} uiSuccessCallback     provided by UI helper to handle success
+         * @param  {Function} exitOnSuccessCallback most relevant callback to exit after save
+         * @param  {Object} response                save result object
+         */
         _performSaveSuccessActions : function(uiSuccessCallback, exitOnSuccessCallback, response) {
             // if an exit callback is provided, we'll call it and we won't call any other
             // success handler
@@ -149,6 +155,11 @@ define([
             }
         },
 
+        /**
+         * On error, validation errors are passed to uiErrorCallback. They'll be handled by opts.onComponentSaveSuccess otherwise
+         * @param  {Function} uiErrorCallback
+         * @param  {Mixed}    errors
+         */
         _performSaveErrorActions : function(uiErrorCallback, errors) {
             Logger.warn('SaveBehavior: unable to save data', arguments);
             // NOTICE:
@@ -160,6 +171,10 @@ define([
             }
         },
 
+        /**
+         * Validates provided options to make sure a couple of required fields are provided
+         * @param  {Object} opts
+         */
         _validateOptions : function(opts) {
             if ('function' !== typeof opts.saveProxyCallback) {
                 Logger.error('SaveBehavior : you must provide a valid saveProxyCallback');
