@@ -34,11 +34,6 @@ define([
             prepareDataForFetch : this.opts.prepareDataForFetch,
             proccessResponse : this.opts.proccessResponse,
             fetchCallback : this.opts.fetchCallback
-
-            // proxy : this.opts.proxy,
-            // // if this opt is provided, `FetchHandler` will attempt to call `proxy[fetchProxyCallbackName]`
-            // // otherwise, we'll assume `proxy.fetch` is the handler
-            // fetchProxyCallbackName : this.opts.fetchProxyCallbackName
         });
     };
 
