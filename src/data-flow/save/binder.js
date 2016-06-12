@@ -162,10 +162,12 @@ define([
          */
         _performSaveErrorActions : function(uiErrorCallback, errors) {
             Logger.warn('SaveBehavior: unable to save data', arguments);
-            // NOTICE:
-            // testing if `errors` is an array is a hint to know if it is a set of validation errors
-            if ('function' === typeof uiErrorCallback && $.isArray(errors)) {
-                uiErrorCallback(errors);
+
+            if ('function' === typeof uiErrorCallback) {
+                var wasHandledByUi = uiErrorCallback(errors);
+                if (!wasHandledByUi) {
+                    this.opts.onComponentSaveError(errors);
+                }
             } else {
                 this.opts.onComponentSaveError(errors);
             }
