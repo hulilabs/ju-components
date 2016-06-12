@@ -67,10 +67,19 @@ Performs a single request to retrieve the resources required by the whole compon
 ### setup
 
 After the resources are loaded, stores a `$view` reference, sets up some resources, caches the tags defined in `this.S`, automatically calls `bindEvents` and performs children set up.
+Implicit flow during `setup`:
+* `this.$view` is set
+* `translateOptions` is called
+* `configureComponent` is called (you should overwrite it and call `appendToView` to initialize view)
+* `_findLocalElems` is called (sets `this.t` with cached tags)
+* `bindEvents` is called (you should overwrite it for event binding)
+* `childrenSetup` is called
+* `READY` event is triggered
+* `setupCompleted` is called
 
 ### setData
 
-If the component includes capabilities to communicate with the server using a proxy (i.e. by composition of FetchHandler) they can retrieve data and load it into the components tree.
+If the component includes capabilities to communicate with the server using a proxy (i.e. they extend from BaseWithProxy) they can retrieve a payload to load data into the component tree.
 
 ## component's api I (data flow)
 
