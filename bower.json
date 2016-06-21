@@ -3,7 +3,7 @@
     "description": "",
     "dependencies": {
         "requirejs" : ">=2.1.20",
-        "ju-shared" : "hulilabs/ju-shared#v1.2.0",
+        "ju-shared" : "hulilabs/ju-shared#v1.2.1",
         "x-editable" : "1.5.1",
         "text" : "2.0.14",
         "mustache.js" : ">=2.2.0",

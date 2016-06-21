@@ -15,10 +15,12 @@
  */
 define([
             'ju-shared/class',
+            'ju-shared/util',
             'ju-components/resource/resource-manager'
         ],
         function(
             Class,
+            Util,
             ResourceManager
         ) {
     'use strict';
@@ -167,15 +169,40 @@ define([
                 return;
             }
 
+            // We iterate over every context key to add it to the resource map
             $.each(contextRequest, function(key, value) {
-                var componentContext = {};
-                componentContext[componentId] = value;
 
-                // Final destination of the context object
-                self.resourceMap.context[key] = $.extend(
-                    true,
-                    self.resourceMap.context[key],
-                    componentContext);
+                // We need to validate if the payload already exists for this key.
+                // In that case we need to merge the component ids that point to the
+                // same value. Duplicating the same payload under a new component id
+                // would cause the extra processing on the server side.
+
+                var existingPayloadCompId =
+                        self._validateExistingPayload(value, self.resourceMap.context[key]);
+
+                if (existingPayloadCompId) {
+                    // We need to merge the component ids that requested the same payload
+                    var contextKeyRequests = self.resourceMap.context[key];
+
+                    // Deletes the current key
+                    delete contextKeyRequests[existingPayloadCompId];
+
+                    // Assign the new key
+                    contextKeyRequests[existingPayloadCompId + ',' + componentId] =
+                        value;
+
+                } else {
+                    // This payload hasnt been requested yet, add it to the resource map
+                    var componentContext = {};
+                    componentContext[componentId] = value;
+
+                    // Final destination of the context object
+                    self.resourceMap.context[key] = $.extend(
+                        true,
+                        self.resourceMap.context[key],
+                        componentContext);
+                }
+
             });
 
         },
@@ -194,6 +221,30 @@ define([
                     collection.push(key);
                 }
             }
+        },
+        /**
+         * Validates if a payload already exists in the given object.
+         * If a match is found, then the key of the payload will be returned
+         *
+         * @return string The key to access the first matched payload
+         */
+        _validateExistingPayload : function(payload, object) {
+
+            if (!object || !payload) {
+                return null;
+            }
+
+            var foundKey = null;
+            $.each(object, function(key, value) {
+                var isSamePayload = Util.isEqual(value, payload);
+                if (isSamePayload) {
+                    foundKey = key;
+                    return false;
+                }
+            });
+
+            return foundKey;
+
         }
     });
 
