@@ -32,9 +32,7 @@ define([
         },
         modifiedHandler : function(changedComponent) {
             var added = this.addChangedComponent(changedComponent);
-            if (added) {
-                this.fireEvent(ChangesTracker.EV.COMPONENT_CHANGED, changedComponent);
-            }
+            this.fireEvent(ChangesTracker.EV.COMPONENT_CHANGED, changedComponent, added);
         }
     });
 
