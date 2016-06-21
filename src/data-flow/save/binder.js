@@ -117,6 +117,10 @@ define([
             this.saveHandler.initializeStrategyWithDataModel(dataModel);
         },
 
+        peekDataToSave : function() {
+            return this.saveHandler.peekDataToSave(this.opts.component);
+        },
+
         _onSaveChangesComponentDiscard : function() {
             log('SaveBehavior : no action defined for "discard changes"');
         },

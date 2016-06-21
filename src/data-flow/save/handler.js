@@ -134,6 +134,10 @@ define([
             return dataForProxy;
         },
 
+        peekDataToSave : function(component) {
+            return this.saveStrategy.getDataForSubmission(component);
+        },
+
         /**
          * Called with the final data right before calling `_submitDataToServer`
          * @param  {Object} data current data to be sent to the server
