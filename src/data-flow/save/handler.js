@@ -106,48 +106,71 @@ define([
          * @return Promise Save promise
          */
         saveData : function(component) {
-            var errors = this._validateAll(component),
+            var self = this,
+                errors = self._validateAll(component),
                 savePromise;
 
             if (!errors || errors.length === 0) {
-                // obtains and process data to be saved
-                var dataToSave = this._getDataToSave(component);
-                savePromise = this._submitDataToServer(dataToSave);
+                savePromise = new Promise(function(resolve, reject) {
+                    // obtains and process data to be saved
+                    self._getDataToSave(component).then(function(dataToSave) {
+                        var submitPromise = self._submitDataToServer(dataToSave);
 
-                savePromise
-                    .then($.proxy(this._onSaveSuccess, this))
-                    ['catch']($.proxy(this._onSaveError, this));
-
+                        submitPromise
+                            .then(function(response) {
+                                self._onSaveSuccess.apply(self, arguments);
+                                resolve(response);
+                            })
+                            ['catch'](function() {
+                                self._onSaveError.apply(self, arguments);
+                                reject();
+                            });
+                    });
+                });
             } else {
-                savePromise = this._getInvalidFieldsPromise(errors);
+                savePromise = self._getInvalidFieldsPromise(errors);
             }
 
             return savePromise;
         },
 
+        /**
+         * Retrieves data to be saved after getter and processing
+         * @param  {Object}  component current component
+         * @return {Promise}           data preparation promise, contains
+         *                             {data, metadata} objects for the proxy
+         */
         _getDataToSave : function(component) {
             // obtains data from strategy
             var data = this.saveStrategy.getDataForSubmission(component);
             // checks if there's a provided callback to make changes before the request
-            var dataForProxy = this._prepareDataWithCallbackOpt(data);
+            var dataPreparationPromise = this._prepareDataWithCallbackOpt(data);
 
-            return dataForProxy;
+            return dataPreparationPromise;
         },
 
         /**
          * Called with the final data right before calling `_submitDataToServer`
-         * @param  {Object} data current data to be sent to the server
-         * @return {Object}      {data, metadata} objects for the proxy
+         * @param  {Object}  data current data to be sent to the server
+         * @return {Promise} promise must return an object containing
+         *                   {data, metadata} objects for the proxy
          */
         _prepareDataWithCallbackOpt : function(data) {
-            if ('function' === typeof this.opts.prepareDataToSave) {
-                return this.opts.prepareDataToSave(data);
-            }
-
-            return {
+            var promise = Promise.resolve({
                 payload : data,
                 metadata : null
-            };
+            });
+
+            if ('function' === typeof this.opts.prepareDataToSave) {
+                var preparedDataToSave = this.opts.prepareDataToSave(data);
+
+                promise = (preparedDataToSave instanceof Promise) ?
+                    preparedDataToSave : Promise.resolve(preparedDataToSave);
+            }
+
+            promise['catch']($.proxy(this._onSaveError, this));
+
+            return promise;
         },
 
         /**
