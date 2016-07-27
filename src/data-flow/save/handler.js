@@ -134,6 +134,12 @@ define([
             return dataForProxy;
         },
 
+        /**
+         * Obtains the data that would be obtained by the strategy right now, without
+         * running the whole save flow
+         * @param  {Component} component to obtain data from
+         * @return {Object}              currently stored data
+         */
         peekDataToSave : function(component) {
             return this.saveStrategy.getDataForSubmission(component);
         },
