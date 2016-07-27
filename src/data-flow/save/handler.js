@@ -135,6 +135,16 @@ define([
         },
 
         /**
+         * Obtains the data that would be obtained by the strategy right now, without
+         * running the whole save flow
+         * @param  {Component} component to obtain data from
+         * @return {Object}              currently stored data
+         */
+        peekDataToSave : function(component) {
+            return this.saveStrategy.getDataForSubmission(component);
+        },
+
+        /**
          * Called with the final data right before calling `_submitDataToServer`
          * @param  {Object} data current data to be sent to the server
          * @return {Object}      {data, metadata} objects for the proxy

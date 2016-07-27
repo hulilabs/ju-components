@@ -20,6 +20,21 @@ define([
     'use strict';
 
     /*
+        Private functions
+     */
+    /**
+     * Sets data into a component, if successful will trigger FETCH_DATA_READY
+     * @param {Component} component
+     * @param {Object}    data
+     */
+    var setDataWithSuccessTrigger = function(component, data) {
+        var setDataResult = component.setData(data);
+        if (setDataResult && setDataResult.success) {
+            component.fireEventAndNotify(DataBehaviorEvents.EV.COMPONENT.FETCH_DATA_READY);
+        }
+    };
+
+    /*
         opts : {
             component
             prepareDataForFetch
@@ -68,13 +83,12 @@ define([
          * @param {Object} data
          */
         setData : function(data) {
-            var component = this.opts.component;
-            var setDataResult = component.setData(data);
-            if (setDataResult && setDataResult.success) {
-                component.fireEventAndNotify(DataBehaviorEvents.EV.COMPONENT.FETCH_DATA_READY);
-            }
+            return setDataWithSuccessTrigger(this.opts.component, data);
         }
     };
+
+    // static methods
+    FetchDataBinder.setDataWithSuccessTrigger = setDataWithSuccessTrigger;
 
     // Exports
     return FetchDataBinder;

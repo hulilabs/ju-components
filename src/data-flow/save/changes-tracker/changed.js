@@ -30,11 +30,14 @@ define([
             // Changed components collector
             CollectChangedComponentsFn.call(this);
         },
+        /**
+         * Handler for when a component report itself or a child as modified
+         * Fires ChangesTracker.EV.COMPONENT_CHANGED event
+         * @param  {object} changedComponent component to be processed as changed
+         */
         modifiedHandler : function(changedComponent) {
             var added = this.addChangedComponent(changedComponent);
-            if (added) {
-                this.fireEvent(ChangesTracker.EV.COMPONENT_CHANGED, changedComponent);
-            }
+            this.fireEvent(ChangesTracker.EV.COMPONENT_CHANGED, changedComponent, added);
         }
     });
 

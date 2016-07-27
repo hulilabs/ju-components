@@ -117,6 +117,15 @@ define([
             this.saveHandler.initializeStrategyWithDataModel(dataModel);
         },
 
+        /**
+         * Obtains the data that would be obtained by the strategy right now, without
+         * running the whole save flow
+         * @return {Object}              currently stored data
+         */
+        peekDataToSave : function() {
+            return this.saveHandler.peekDataToSave(this.opts.component);
+        },
+
         _onSaveChangesComponentDiscard : function() {
             log('SaveBehavior : no action defined for "discard changes"');
         },
