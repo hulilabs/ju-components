@@ -671,8 +671,12 @@ define([
                 if (modelType == 'object' || modelType == 'undefined') {
                     mergedData = $.extend(this.model, localData);
                 } else {
-                    // Error, types mitmatch
-                    Logger.error('_getAllData: localData and model data dont have the same type', localData, this.model);
+
+                    if (localData && this.model && (localDataType !== modelType)) {
+                        // Error: types mismatch
+                        Logger.error('_getAllData: localData and model data dont have the same type', localData, this.model);
+                    }
+
                     mergedData = localData;
                 }
             } else {
