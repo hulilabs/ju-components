@@ -587,13 +587,21 @@ define([
                 // Close containers when click outsideing
                 // (ghost click solution compatible for desktop-surface-tablet-mobile)
                 document.addEventListener('touchstart', function(e) {
-                    e.stopPropagation();
+                    // We don't use bind, because this method could be potencially be overwritten
+                    self.onTouchStartHanlder(e);
                 }, true);
                 document.addEventListener('touchend', $.proxy(this._onDocumentClick, this), true);
                 document.addEventListener('click', $.proxy(this._onDocumentClick, this), true);
 
                 self.documentEventsAttached = true;
             }
+        },
+        /**
+         * Default touch start handler executed used to decided whether the
+         * component should be close or not
+         */
+        onTouchStartHanlder : function(e) {
+            e.stopPropagation();
         }
     });
 
