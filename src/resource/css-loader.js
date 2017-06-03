@@ -65,7 +65,7 @@ define([
                 var isSupported;
                 if (!eventName) { return false; }
                 if (!element || typeof element === 'string') {
-                    element = createElement(element || 'div');
+                    element = createElement(element || 'div'); // jshint ignore:line
                 }
 
                 // Testing via the `in` operator is sufficient for modern browsers and IE.
@@ -79,7 +79,7 @@ define([
                     if (!element.setAttribute) {
                         // Switch to generic element if it lacks `setAttribute`.
                         // It could be the `document`, `window`, or something else.
-                        element = createElement('div');
+                        element = createElement('div'); // jshint ignore:line
                     }
 
                     element.setAttribute(eventName, '');
