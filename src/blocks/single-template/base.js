@@ -28,7 +28,7 @@ define([
         /**
          * @param args (array) bypass extended constructor arguments
          */
-        init : function(args, templatePath, resourcesDef, childrenDef) {
+        init : function(args, template, resourcesDef, childrenDef) {
             this._super.apply(this, args);
 
             this.setChildrenDefinition(childrenDef);
@@ -36,21 +36,15 @@ define([
             this.addResources(resourcesDef);
 
             // Single Template
-            if (templatePath) {
-                // Define template
-                this.addResources({
-                    template : [
-                        templatePath
-                    ]
-                });
-                this.templatePath = templatePath;
+            if (template) {
+                // template path is now actual template
+                this.template = template;
             }
         },
         configureComponent : function() {
             // Single Template
-            if (this.templatePath) {
-                var template = TemplateStorage.getInst().get(this.templatePath);
-                this.appendToView(template);
+            if (this.template) {
+                this.appendToView(this.template);
             }
         }
     });

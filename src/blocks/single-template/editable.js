@@ -16,7 +16,8 @@
 define([
             'ju-components/blocks/editable',
             'ju-components/resource/storage/template-storage',
-            'ju-shared/l10n'
+            'ju-shared/l10n',
+            'css/ju-components/blocks/single-template/editable.css'
         ],
         function(
             EditableComponent,
@@ -26,11 +27,7 @@ define([
 
     'use strict';
 
-    var RESOURCE_MAP = {
-        cssFile : [
-            'css/ju-components/blocks/single-template/editable'
-        ]
-    };
+    var RESOURCE_MAP = {};
 
     var SingleTemplateEditableComponent = EditableComponent.extend({
         /**
@@ -68,7 +65,7 @@ define([
         configureComponent : function() {
             // Single Template
             if (this.templatePath) {
-                var template = TemplateStorage.getInst().get(this.templatePath);
+                var template = this.templatePath;
                 this.appendToView(template);
             }
 
