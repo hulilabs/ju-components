@@ -17,8 +17,7 @@ define([
             'ju-shared/observable-class',
             'ju-shared/util',
             'ju-components/factory/base',
-            'ju-components/helper/options',
-            'ju-components/resource/resource-collector',
+            'ju-components/resource-collector',
             'ju-components/resource/resource-manager',
             'ju-components/util',
             'ju-components/backbone',
@@ -29,7 +28,6 @@ define([
             ObservableClass,
             Util,
             FactoryBase,
-            OptionsHelper,
             ResourceCollector,
             ResourceManager,
             ComponentUtil,
@@ -192,9 +190,7 @@ define([
             /**
              * Stores the options for this
              */
-            this._initOptsManager();
-            this.optsManager.prepareOptions(opts);
-            this.opts = this.optsManager.getOptions();
+            this.prepareOptions(opts);
 
             // Reference to the spinner
             this.spinnerComp = null;
@@ -426,20 +422,33 @@ define([
          */
         setupCompleted : function() { },
         /**
-         * Initialize options manager
-         * @see  OptionsHelper
-         */
-        _initOptsManager : function() {
-            this.optsManager = this.optsManager || new OptionsHelper();
-        },
-        /**
-         * Store options in manager
-         * @decorator
-         * @see  OptionsHelper
+         * Include options in the opts collector
+         * Set default options and override parents options
+         * Keeps the flow from child to parent (no untraceable flows with before and after super)
+         * - Child options always have precedence over parent options
+         * - Parent options should never overwrite children options
+         * @warn ALWAYS call setOptions BEFORE _super
+         * @param {object} class level options to queue
          */
         setOptions : function() {
-            this._initOptsManager();
-            this.optsManager.setOptions.apply(this.optsManager, arguments);
+            this.optsCollector = this.optsCollector || [];
+            // Optimized array prepend
+            var i, argLen, len = this.optsCollector.length + arguments.length,
+                optsArr = new Array(len);
+
+            for (i = 0, argLen = arguments.length; i < argLen; i++) {
+                optsArr[i] = arguments[i];
+            }
+
+            for (i = 0; i < len; i++) {
+                optsArr.push(this.optsCollector[i]);
+
+            }
+            this.optsCollector = optsArr;
+        },
+        prepareOptions : function(forcedOpts) {
+            // Merge options collector
+            this.opts = $.extend.apply($, [true, {}].concat(this.optsCollector).concat([forcedOpts]));
         },
         /**
          * Merge selectors into the selector dictionary (collector) used by _findLocalElems
@@ -671,12 +680,8 @@ define([
                 if (modelType == 'object' || modelType == 'undefined') {
                     mergedData = $.extend(this.model, localData);
                 } else {
-
-                    if (localData && this.model && (localDataType !== modelType)) {
-                        // Error: types mismatch
-                        Logger.error('_getAllData: localData and model data dont have the same type', localData, this.model);
-                    }
-
+                    // Error, types mitmatch
+                    Logger.error('_getAllData: localData and model data dont have the same type', localData, this.model);
                     mergedData = localData;
                 }
             } else {

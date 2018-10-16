@@ -332,7 +332,7 @@ define([
                     // isEmpty can be undefined
                     // ..but promise AND isEmpty can't be processed
                     if (typeof childEmptinessPromise === 'undefined' && childEmptinessUndefined) {
-                        Logger.error('base-ui : checkLocalEmptiness : unkown empty state or promise', childResult);
+                        Logger.error('base-ui : checkLocalEmptiness : unkown empty state or promise', childrenEmptiness);
                     }
 
                     // Verify first if there is any unresolved promise
@@ -365,17 +365,7 @@ define([
                 // Resolved promise callback considers emptiness check result (emptyState)
                 var allChildrenEmptiness = Promise.all(childrenEmptinessPromisesArray),
                     chainAllChildrenEmptiness = allChildrenEmptiness.then(function(results) {
-                        // Check all results are true
-                        var isLocalEmpty = results.every(function(value) {
-                            if (typeof value === 'boolean') {
-                                return value === true;
-                            } else if (typeof value === 'object') {
-                                return self.checkLocalEmptiness(value);
-                            } else {
-                                Logger.error('base-ui : unknown child emptiness result', value);
-                                return false;
-                            }
-                        });
+                        var isLocalEmpty = self.checkLocalEmptiness(results[0]);
                         // Empty if promise results are empty and outter result is empty too
                         return emptyState && isLocalEmpty;
                     });

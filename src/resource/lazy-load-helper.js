@@ -12,7 +12,7 @@ define([
             'ju-shared/class',
             'ju-shared/l10n',
             'ju-shared/app-config-manager',
-            'ju-components/resource/resource-collector',
+            'ju-components/resource-collector',
             'ju-components/resource/resource-manager',
             'ju-components/resource/storage/template-storage',
             'ju-components/resource/storage/options-data-storage',

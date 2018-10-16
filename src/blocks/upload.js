@@ -20,7 +20,7 @@ define([
             'ju-components/blocks/single-template/base',
             'ju-components/resource/storage/context-storage',
             // Unmapped imports
-            'dropzone'
+            // 'dropzone'
         ],
         function(
             SingleTemplateComponent
