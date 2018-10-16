@@ -17,8 +17,8 @@ define([
             'ju-components/base',
             'ju-components/resource/css-loader',
             // Pre-load resources
-            'text!ju-components/blocks/error-handler/style.css',
-            'text!ju-components/blocks/error-handler/template.html'
+            'ju-components/blocks/error-handler/style.css',
+            'ju-components/blocks/error-handler/template.html'
         ],
         function(
             $,

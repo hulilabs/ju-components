@@ -369,7 +369,7 @@ define([
                     filePathIncludesExt = (key.lastIndexOf('/') < key.lastIndexOf('.')),
                     fileExt = filePathIncludesExt ? '' : templatesConfig.templateExtension;
 
-                dependencies[key] = 'text!' + templatesConfig.templatePath + key + fileExt;
+                dependencies[key] = '' + templatesConfig.templatePath + key + fileExt;
             }
             return dependencies;
         },

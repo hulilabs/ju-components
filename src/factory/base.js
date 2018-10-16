@@ -54,7 +54,11 @@ define([
                             compDefinition = $.extend(true, {}, compDef),
                             // Creates a map of the components definition
                             modulesPaths = $.map(compDefinition, function(def) {
-                                return def.component;
+                                if ('function' !== typeof def.component) {
+                                    throw new Error("Attempted to load component that's not a function " + def.component);
+                                }
+
+                                return def.component();
                             });
 
                         // @niceToHave At this point if the childrenExtendedOpts contains paths to
@@ -63,15 +67,14 @@ define([
 
                         log('ComponentFactoryBase: Fetching the following modules files', modulesPaths);
                         // Load all the modules
-                        require(modulesPaths, function() {
+                        Promise.all(modulesPaths).then(function(componentsClasses) {
                             // call the fetched children method of the children
 
-                            var componentsClasses = arguments,
-                                childrenReadyPromises = [],
+                            var childrenReadyPromises = [],
                                 index = 0;
 
                             $.each(compDefinition, function(key, def) {
-                                var ComponentClass = componentsClasses[index],
+                                var ComponentClass = componentsClasses[index].default,
                                     opts = def.opts,
                                     childExtendedOpts;
 
