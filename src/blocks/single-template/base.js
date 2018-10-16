@@ -1,4 +1,3 @@
-
 /**                   _
  *  _             _ _| |_
  * | |           | |_   _|
@@ -13,22 +12,14 @@
 /**
  * Single Template
  */
-define([
-            'ju-components/blocks/base-ui',
-            'ju-components/resource/storage/template-storage'
-        ],
-        function(
-            BaseUIComponent,
-            TemplateStorage
-        ) {
-
+define(['ju-components/blocks/base-ui'], function(BaseUIComponent) {
     'use strict';
 
     var SingleTemplateComponent = BaseUIComponent.extend({
         /**
          * @param args (array) bypass extended constructor arguments
          */
-        init : function(args, template, resourcesDef, childrenDef) {
+        init: function(args, template, resourcesDef, childrenDef) {
             this._super.apply(this, args);
 
             this.setChildrenDefinition(childrenDef);
@@ -41,14 +32,13 @@ define([
                 this.template = template;
             }
         },
-        configureComponent : function() {
+        configureComponent: function() {
             // Single Template
             if (this.template) {
                 this.appendToView(this.template);
             }
-        }
+        },
     });
 
     return SingleTemplateComponent;
-
 });
