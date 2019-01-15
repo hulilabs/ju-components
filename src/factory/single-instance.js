@@ -35,7 +35,7 @@ define([
                 }
 
                 var instancePromise = new Promise(function(resolve /* , reject */) {
-                    require(['ju-components/blocks/spinner/inpage-spinner/spinner'], function(SpinnerClass) {
+                    componentDefObj.component().then(function(SpinnerClass) {
                         var compInstance = new SpinnerClass(componentDefObj.opts);
                         compInstance.isRootComponent = true;
 
