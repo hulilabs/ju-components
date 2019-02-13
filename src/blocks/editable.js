@@ -21,7 +21,8 @@ define([
             /*
                 Unmapped modules
              */
-            'x-editable'
+            'x-editable',
+            'css/ju-components/blocks/editable.css'
         ],
         function(
             BaseUIComponent,
@@ -40,11 +41,7 @@ define([
         ELEM_DATA_KEY = 'updateableComp',
         ALWAYS_EDITABLE_CLASS = 'always-editable';
 
-    var RESOURCE_MAP = {
-        cssFile : [
-            'css/ju-components/blocks/editable'
-        ]
-    };
+    var RESOURCE_MAP = {};
 
     /**
      * Represents a simple input text editable component

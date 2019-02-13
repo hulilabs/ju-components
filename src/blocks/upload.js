@@ -20,7 +20,8 @@ define([
             'ju-components/blocks/single-template/base',
             'ju-components/resource/storage/context-storage',
             // Unmapped imports
-            'dropzone'
+            'dropzone',
+            'css/vendor/dropzone/basic.css'
         ],
         function(
             SingleTemplateComponent
@@ -46,9 +47,6 @@ define([
             'dropzone_cancel_upload_btn_yes',
             'dropzone_cancel_upload_btn_no'
         ],
-        cssFile : [
-            'css/vendor/dropzone/basic'
-        ]
     };
 
     var UploadAreaComponent = SingleTemplateComponent.extend({
